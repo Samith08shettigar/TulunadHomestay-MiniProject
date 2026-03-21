@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}404 Not Found — Tulunad Homestay{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="error-page">
+        <div class="error-icon">🌲</div>
+        <h1 class="error-code">404</h1>
+        <h2 class="error-title">Lost in the Forest</h2>
+        <p class="error-desc">The page you're looking for doesn't exist. It might have been moved or the URL may be incorrect.</p>
+        <div class="hero-actions">
+            <a href="{{ url_for('home') }}" class="btn btn-primary">Go Home</a>
+            <a href="{{ url_for('user.rooms') }}" class="btn btn-outline">Browse Rooms</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

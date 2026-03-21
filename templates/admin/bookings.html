@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Manage Bookings — Tulunad Homestay{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header mt-4">
+        <h2>Manage Bookings</h2>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Guest</th>
+                    <th>Room</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Meal</th>
+                    <th>Fire Camp</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking['id'] }}</td>
+                    <td>{{ booking['user_name'] }}</td>
+                    <td>{{ booking['room_name'] }}</td>
+                    <td>{{ booking['checkin_date'] }}</td>
+                    <td>{{ booking['checkout_date'] }}</td>
+                    <td>{{ booking['meal_type'] or '—' }}</td>
+                    <td>{{ booking['fire_camp'] or '—' }}</td>
+                    <td>
+                        {% if booking['status'] == 'Confirmed' %}
+                            <span class="badge badge-success">Confirmed</span>
+                        {% elif booking['status'] == 'Cancelled' %}
+                            <span class="badge badge-danger">Cancelled</span>
+                        {% else %}
+                            <span class="badge badge-warning">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if booking['status'] == 'Pending' %}
+                        <form method="POST" action="{{ url_for('admin.update_booking', booking_id=booking['id']) }}" class="inline-status-form">
+                            <select name="status" class="form-control form-control-sm">
+                                <option value="" disabled selected>Change…</option>
+                                <option value="Confirmed">Confirm</option>
+                                <option value="Cancelled">Cancel</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                        </form>
+                        {% elif booking['status'] == 'Confirmed' %}
+                        <form method="POST" action="{{ url_for('admin.update_booking', booking_id=booking['id']) }}" class="inline-status-form">
+                            <input type="hidden" name="status" value="Cancelled">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Cancel this booking?');">Cancel</button>
+                        </form>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" class="text-center text-muted" style="padding:40px 20px;">No bookings yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

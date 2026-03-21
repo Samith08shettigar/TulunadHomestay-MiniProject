@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — Tulunad Homestay{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header mt-4">
+        <h2>Welcome, {{ session.get('user_name') }} 👋</h2>
+    </div>
+
+    <div class="grid-3 mb-4">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_bookings }}</div>
+            <div class="stat-label">Total Bookings</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ confirmed_bookings }}</div>
+            <div class="stat-label">Confirmed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number text-accent">{{ total_bookings - confirmed_bookings }}</div>
+            <div class="stat-label">Pending / Other</div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <a href="{{ url_for('user.rooms') }}" class="stat-card" style="text-decoration:none; color:inherit;">
+            <div style="font-size:1.6rem; margin-bottom:6px;">🏡</div>
+            <div class="stat-label" style="font-weight:600; color:var(--text);">Browse Rooms</div>
+            <div class="stat-label">Explore our forest homestay rooms</div>
+        </a>
+        <a href="{{ url_for('user.rooms') }}" class="stat-card" style="text-decoration:none; color:inherit;">
+            <div style="font-size:1.6rem; margin-bottom:6px;">📋</div>
+            <div class="stat-label" style="font-weight:600; color:var(--text);">My Bookings</div>
+            <div class="stat-label">View your booking history</div>
+        </a>
+    </div>
+</div>
+{% endblock %}

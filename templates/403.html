@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}403 Forbidden — Tulunad Homestay{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="error-page">
+        <div class="error-icon">🚫</div>
+        <h1 class="error-code">403</h1>
+        <h2 class="error-title">Access Denied</h2>
+        <p class="error-desc">Sorry, you don't have permission to access this page.</p>
+        <div class="hero-actions">
+            <a href="{{ url_for('home') }}" class="btn btn-primary">Go Home</a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard — Tulunad Homestay{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header mt-4">
+        <h2>Admin Dashboard</h2>
+    </div>
+    <p class="text-muted mb-3">Welcome, {{ session.get('user_name') }}. Manage your homestay from here.</p>
+
+    <!-- Stats Cards -->
+    <div class="grid-4 mb-4">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_rooms }}</div>
+            <div class="stat-label">Total Rooms</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_bookings }}</div>
+            <div class="stat-label">Total Bookings</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number text-accent">{{ pending_count }}</div>
+            <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number text-success">{{ confirmed_count }}</div>
+            <div class="stat-label">Confirmed</div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="grid-3">
+        <a href="{{ url_for('admin.rooms') }}" class="stat-card admin-quick-link">
+            <div class="quick-link-icon">🏡</div>
+            <div class="quick-link-title">Manage Rooms</div>
+            <div class="stat-label">Add, edit or remove rooms</div>
+        </a>
+        <a href="{{ url_for('admin.bookings') }}" class="stat-card admin-quick-link">
+            <div class="quick-link-icon">📋</div>
+            <div class="quick-link-title">Manage Bookings</div>
+            <div class="stat-label">Confirm or cancel reservations</div>
+        </a>
+        <a href="{{ url_for('admin.feedback') }}" class="stat-card admin-quick-link">
+            <div class="quick-link-icon">⭐</div>
+            <div class="quick-link-title">View Feedback</div>
+            <div class="stat-label">Read guest reviews & ratings</div>
+        </a>
+    </div>
+</div>
+{% endblock %}

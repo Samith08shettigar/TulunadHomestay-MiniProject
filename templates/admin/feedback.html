@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Guest Feedback — Tulunad Homestay{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header mt-4">
+        <h2>Guest Feedback</h2>
+    </div>
+
+    <!-- Average Rating Card -->
+    <div class="grid-3 mb-4">
+        <div class="stat-card">
+            <div class="stat-number text-accent">{{ avg_rating }}</div>
+            <div class="stat-label">Average Rating (out of 5)</div>
+            <div class="stars mt-1">
+                {% for i in range(avg_rating | int) %}★{% endfor %}{% for i in range(5 - avg_rating | int) %}☆{% endfor %}
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_reviews }}</div>
+            <div class="stat-label">Total Reviews</div>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Guest</th>
+                    <th>Room</th>
+                    <th>Stay Dates</th>
+                    <th>Rating</th>
+                    <th>Comment</th>
+                    <th>Submitted</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fb in feedbacks %}
+                <tr>
+                    <td>{{ fb['id'] }}</td>
+                    <td>{{ fb['user_name'] }}</td>
+                    <td>{{ fb['room_name'] }}</td>
+                    <td>{{ fb['checkin_date'] }} → {{ fb['checkout_date'] }}</td>
+                    <td>
+                        <span class="stars">
+                            {% for i in range(fb['rating']) %}★{% endfor %}{% for i in range(5 - fb['rating']) %}☆{% endfor %}
+                        </span>
+                        <span class="text-muted" style="margin-left:4px; font-size:0.8rem;">({{ fb['rating'] }}/5)</span>
+                    </td>
+                    <td class="feedback-comment">{{ fb['comment'] or '—' }}</td>
+                    <td>{{ fb['created_at'][:10] if fb['created_at'] else '—' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted" style="padding:40px 20px;">No feedback submitted yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

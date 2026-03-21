@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Manage Rooms — Tulunad Homestay{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header mt-4">
+        <h2>Manage Rooms</h2>
+        <a href="{{ url_for('admin.add_room') }}" class="btn btn-primary btn-sm">+ Add Room</a>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Image</th>
+                    <th>Room Name</th>
+                    <th>Price (₹)</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for room in rooms %}
+                <tr>
+                    <td>{{ room['id'] }}</td>
+                    <td>
+                        {% if room['image_url'] %}
+                            <img src="{{ room['image_url'] }}" alt="{{ room['room_name'] }}" class="table-thumb">
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td><strong>{{ room['room_name'] }}</strong></td>
+                    <td>₹{{ "%.0f"|format(room['price']) }}</td>
+                    <td>👥 {{ room['capacity'] }}</td>
+                    <td>
+                        {% if room['availability'] %}
+                            <span class="badge badge-success">Available</span>
+                        {% else %}
+                            <span class="badge badge-danger">Unavailable</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            <a href="{{ url_for('admin.edit_room', room_id=room['id']) }}" class="btn btn-outline btn-sm">Edit</a>
+                            <form method="POST" action="{{ url_for('admin.delete_room', room_id=room['id']) }}" onsubmit="return confirm('Delete this room?');" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted" style="padding:40px 20px;">No rooms added yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

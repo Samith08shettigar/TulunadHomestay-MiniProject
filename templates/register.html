@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register — Tulunad Homestay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(160deg, #f5f0e8 0%, #e8f0e5 40%, #f0ebe3 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        /* Flash messages */
+        .flash-list { list-style: none; margin-bottom: 16px; }
+        .flash-item {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: slideDown 0.3s ease-out;
+        }
+        .flash-success { background: #edf7ef; color: #3a6347; border-left: 4px solid #4A7C59; }
+        .flash-danger  { background: #fdedeb; color: #c0392b; border-left: 4px solid #c0392b; }
+        .flash-info    { background: #e8f4f8; color: #2e86ab; border-left: 4px solid #2e86ab; }
+        .flash-warning { background: #fdf6e3; color: #b8903d; border-left: 4px solid #D4A853; }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Card */
+        .auth-card {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+            padding: 44px 36px 36px;
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 2.2rem;
+        }
+
+        .auth-title {
+            font-family: 'Nunito', sans-serif;
+            text-align: center;
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: #2D2D2D;
+            margin-bottom: 4px;
+        }
+
+        .auth-subtitle {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #9B9B9B;
+            margin-bottom: 28px;
+        }
+
+        /* Form */
+        .input-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #4A4A4A;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            color: #9B9B9B;
+            pointer-events: none;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 13px 16px 13px 42px;
+            border: 1.5px solid #E8E6E1;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: #2D2D2D;
+            background: #FAFAF8;
+            outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .input-wrapper input:focus {
+            border-color: #4A7C59;
+            box-shadow: 0 0 0 3px rgba(74,124,89,0.1);
+            background: #fff;
+        }
+        .input-wrapper input::placeholder { color: #BCBCBC; }
+
+        /* Error state */
+        .input-wrapper input.input-error {
+            border-color: #c0392b;
+            box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+        }
+
+        .error-text {
+            font-size: 0.8rem;
+            color: #c0392b;
+            margin-top: 6px;
+            display: none;
+            font-weight: 500;
+        }
+        .error-text.visible { display: block; }
+
+        .btn-register {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: #4A7C59;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
+            margin-top: 6px;
+        }
+        .btn-register:hover {
+            background: #3a6347;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(74,124,89,0.25);
+        }
+        .btn-register:active {
+            transform: translateY(0);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 0.9rem;
+            color: #6B6B6B;
+        }
+        .auth-footer a {
+            color: #4A7C59;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .auth-decor {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.8rem;
+            color: #BCBCBC;
+        }
+
+        @media (max-width: 480px) {
+            .auth-card { padding: 32px 24px 28px; }
+            body { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-list">
+                    {% for category, message in messages %}
+                        <li class="flash-item flash-{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <div class="auth-card">
+            <div class="auth-logo">🌿</div>
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join Tulunad Homestay for a nature retreat</p>
+
+            <form method="POST" action="{{ url_for('auth.register') }}" id="registerForm">
+                <div class="input-group">
+                    <label for="name">Full Name</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="name" name="name" placeholder="Your full name" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">✉</span>
+                        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="password" name="password" placeholder="Create a password" required minlength="4">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="confirm_password" placeholder="Re-enter your password" required>
+                    </div>
+                    <p class="error-text" id="passwordError">Passwords do not match</p>
+                </div>
+
+                <button type="submit" class="btn-register">Register</button>
+            </form>
+
+            <p class="auth-footer">
+                Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>
+            </p>
+        </div>
+
+        <p class="auth-decor">🌿 Tulunad Homestay · Udupi, Karnataka</p>
+    </div>
+
+    <script>
+        const form = document.getElementById('registerForm');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm_password');
+        const errorText = document.getElementById('passwordError');
+
+        function validatePasswords() {
+            if (confirmPassword.value && password.value !== confirmPassword.value) {
+                confirmPassword.classList.add('input-error');
+                errorText.classList.add('visible');
+                return false;
+            } else {
+                confirmPassword.classList.remove('input-error');
+                errorText.classList.remove('visible');
+                return true;
+            }
+        }
+
+        confirmPassword.addEventListener('input', validatePasswords);
+        password.addEventListener('input', function() {
+            if (confirmPassword.value) validatePasswords();
+        });
+
+        form.addEventListener('submit', function(e) {
+            if (!validatePasswords()) {
+                e.preventDefault();
+                confirmPassword.focus();
+            }
+        });
+    </script>
+</body>
+</html>

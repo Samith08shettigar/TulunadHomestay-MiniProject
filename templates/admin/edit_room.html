@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Edit Room — Tulunad Homestay{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header mt-4">
+        <h2>Edit Room</h2>
+        <a href="{{ url_for('admin.rooms') }}" class="btn btn-outline btn-sm">← Back to Rooms</a>
+    </div>
+
+    <div class="form-card">
+        <form method="POST" action="{{ url_for('admin.edit_room', room_id=room['id']) }}">
+            <div class="form-group">
+                <label class="form-label" for="room_name">Room Name</label>
+                <input type="text" name="room_name" id="room_name" class="form-control" value="{{ room['room_name'] }}" required>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label class="form-label" for="price">Price per Night (₹)</label>
+                    <input type="number" name="price" id="price" class="form-control" value="{{ room['price'] }}" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="capacity">Capacity (Guests)</label>
+                    <input type="number" name="capacity" id="capacity" class="form-control" value="{{ room['capacity'] }}" min="1" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="description">Description</label>
+                <textarea name="description" id="description" class="form-control">{{ room['description'] or '' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="image_url">Image URL</label>
+                <input type="url" name="image_url" id="image_url" class="form-control" value="{{ room['image_url'] or '' }}">
+            </div>
+
+            {% if room['image_url'] %}
+            <div class="form-group">
+                <img src="{{ room['image_url'] }}" alt="Current image" class="form-preview-img">
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label class="form-label form-check-label">
+                    <input type="checkbox" name="availability" value="1" {{ 'checked' if room['availability'] else '' }} class="form-check-input">
+                    Available for booking
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

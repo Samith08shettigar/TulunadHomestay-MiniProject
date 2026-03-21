@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+{% block title %}Book {{ room['room_name'] }} — Tulunad Homestay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .booking-layout {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 32px;
+        align-items: start;
+    }
+
+    /* Room Summary Card */
+    .room-summary {
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        position: sticky;
+        top: 88px;
+    }
+    .room-summary img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+    }
+    .room-summary-body {
+        padding: 24px;
+    }
+    .room-summary-name {
+        font-family: 'Nunito', sans-serif;
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    .room-summary-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 6px;
+    }
+    .room-summary-price span {
+        font-size: 0.85rem;
+        font-weight: 400;
+        color: var(--text-muted);
+    }
+    .room-summary-meta {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        margin-bottom: 12px;
+    }
+    .room-summary-desc {
+        font-size: 0.875rem;
+        color: var(--text-light);
+        line-height: 1.6;
+    }
+
+    /* Booking Form Card */
+    .booking-form-card {
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        padding: 32px;
+    }
+    .booking-form-card h2 {
+        margin-bottom: 24px;
+        font-size: 1.4rem;
+    }
+
+    .date-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .radio-group {
+        display: flex;
+        gap: 20px;
+        margin-top: 4px;
+    }
+    .radio-group label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        font-size: 0.925rem;
+        color: var(--text);
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+    .radio-group input[type="radio"] {
+        accent-color: var(--primary);
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Live Total */
+    .price-summary {
+        background: var(--bg-alt);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin: 24px 0;
+    }
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.925rem;
+        color: var(--text-light);
+        margin-bottom: 8px;
+    }
+    .price-row:last-child {
+        margin-bottom: 0;
+        padding-top: 10px;
+        border-top: 1px solid var(--border);
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--primary);
+    }
+
+    @media (max-width: 768px) {
+        .booking-layout {
+            grid-template-columns: 1fr;
+        }
+        .room-summary { position: static; }
+        .date-row { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header mt-4">
+        <h2>Book Your Stay</h2>
+        <a href="{{ url_for('user.rooms') }}" class="btn btn-outline btn-sm">← Back to Rooms</a>
+    </div>
+
+    <div class="booking-layout">
+        <!-- Room Summary -->
+        <div class="room-summary">
+            <img
+                src="{{ room['image_url'] }}"
+                alt="{{ room['room_name'] }}"
+                onerror="this.src='https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800'"
+            >
+            <div class="room-summary-body">
+                <div class="room-summary-name">{{ room['room_name'] }}</div>
+                <div class="room-summary-price">
+                    ₹{{ "%.0f"|format(room['price']) }} <span>/ night</span>
+                </div>
+                <div class="room-summary-meta">👥 {{ room['capacity'] }} guests max</div>
+                <div class="room-summary-desc">{{ room['description'] }}</div>
+            </div>
+        </div>
+
+        <!-- Booking Form -->
+        <div class="booking-form-card">
+            <h2>Reservation Details</h2>
+
+            <form method="POST" action="{{ url_for('user.book_room', room_id=room['id']) }}" id="bookingForm">
+                <div class="date-row">
+                    <div class="form-group">
+                        <label for="checkin_date" class="form-label">Check-in Date</label>
+                        <input type="date" class="form-control" id="checkin_date"
+                               name="checkin_date" min="{{ today }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkout_date" class="form-label">Check-out Date</label>
+                        <input type="date" class="form-control" id="checkout_date"
+                               name="checkout_date" min="{{ today }}" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="meal_type" class="form-label">Meal Preference</label>
+                    <select class="form-control" id="meal_type" name="meal_type">
+                        <option value="Veg">🥬 Vegetarian</option>
+                        <option value="Non-Veg">🍗 Non-Vegetarian</option>
+                        <option value="Both">🍽️ Both (Veg + Non-Veg)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Campfire Experience</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="fire_camp" value="Yes">
+                            🔥 Yes, I'd love a campfire!
+                        </label>
+                        <label>
+                            <input type="radio" name="fire_camp" value="No" checked>
+                            No thanks
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Live Price Summary -->
+                <div class="price-summary" id="priceSummary" style="display:none;">
+                    <div class="price-row">
+                        <span>Price per night</span>
+                        <span>₹{{ "%.0f"|format(room['price']) }}</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Number of nights</span>
+                        <span id="nightCount">—</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Estimated Total</span>
+                        <span id="totalPrice">—</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" id="submitBtn" disabled>
+                    Confirm Booking
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const pricePerNight = {{ room['price'] }};
+    const checkinInput = document.getElementById('checkin_date');
+    const checkoutInput = document.getElementById('checkout_date');
+    const priceSummary = document.getElementById('priceSummary');
+    const nightCount = document.getElementById('nightCount');
+    const totalPrice = document.getElementById('totalPrice');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function updatePrice() {
+        const checkin = checkinInput.value;
+        const checkout = checkoutInput.value;
+
+        if (checkin && checkout) {
+            const d1 = new Date(checkin);
+            const d2 = new Date(checkout);
+            const diffTime = d2 - d1;
+            const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (nights > 0) {
+                nightCount.textContent = nights + (nights === 1 ? ' night' : ' nights');
+                totalPrice.textContent = '₹' + (nights * pricePerNight).toLocaleString('en-IN');
+                priceSummary.style.display = 'block';
+                submitBtn.disabled = false;
+            } else {
+                priceSummary.style.display = 'none';
+                submitBtn.disabled = true;
+            }
+        } else {
+            priceSummary.style.display = 'none';
+            submitBtn.disabled = true;
+        }
+    }
+
+    // Auto-set checkout min when checkin changes
+    checkinInput.addEventListener('change', function() {
+        if (this.value) {
+            const nextDay = new Date(this.value);
+            nextDay.setDate(nextDay.getDate() + 1);
+            const minCheckout = nextDay.toISOString().split('T')[0];
+            checkoutInput.min = minCheckout;
+            if (checkoutInput.value && checkoutInput.value <= this.value) {
+                checkoutInput.value = minCheckout;
+            }
+        }
+        updatePrice();
+    });
+
+    checkoutInput.addEventListener('change', updatePrice);
+</script>
+{% endblock %}

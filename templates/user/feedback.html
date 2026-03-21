@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block title %}Leave Feedback — Tulunad Homestay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .feedback-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .stay-summary {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        padding: 20px 24px;
+        margin-bottom: 28px;
+    }
+    .stay-summary img {
+        width: 100px;
+        height: 70px;
+        object-fit: cover;
+        border-radius: var(--radius-sm);
+    }
+    .stay-info h3 {
+        margin-bottom: 4px;
+    }
+    .stay-dates {
+        font-size: 0.875rem;
+        color: var(--text-light);
+    }
+
+    /* Star rating — pure CSS with radio inputs */
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 4px;
+        margin: 8px 0 4px;
+    }
+    .star-rating input {
+        display: none;
+    }
+    .star-rating label {
+        font-size: 2rem;
+        color: var(--border);
+        cursor: pointer;
+        transition: color 0.15s ease, transform 0.15s ease;
+        line-height: 1;
+    }
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+        color: var(--accent);
+    }
+    .star-rating label:hover {
+        transform: scale(1.2);
+    }
+
+    .rating-hint {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+    }
+
+    .char-count {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-align: right;
+        margin-top: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header mt-4">
+        <h2>Leave Feedback</h2>
+        <a href="{{ url_for('user.my_bookings') }}" class="btn btn-outline btn-sm">← Back to Bookings</a>
+    </div>
+
+    <div class="feedback-wrapper">
+        <!-- Stay Summary -->
+        <div class="stay-summary">
+            {% if booking['image_url'] %}
+                <img src="{{ booking['image_url'] }}" alt="{{ booking['room_name'] }}">
+            {% endif %}
+            <div class="stay-info">
+                <h3>{{ booking['room_name'] }}</h3>
+                <div class="stay-dates">
+                    📅 {{ booking['checkin_date'] }} → {{ booking['checkout_date'] }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Form -->
+        <div class="form-card">
+            <form method="POST" action="{{ url_for('user.feedback', booking_id=booking['id']) }}" id="feedbackForm">
+                <div class="form-group">
+                    <label class="form-label">Your Rating</label>
+                    <div class="star-rating">
+                        <input type="radio" id="star5" name="rating" value="5">
+                        <label for="star5" title="5 — Excellent">★</label>
+                        <input type="radio" id="star4" name="rating" value="4">
+                        <label for="star4" title="4 — Very Good">★</label>
+                        <input type="radio" id="star3" name="rating" value="3">
+                        <label for="star3" title="3 — Good">★</label>
+                        <input type="radio" id="star2" name="rating" value="2">
+                        <label for="star2" title="2 — Fair">★</label>
+                        <input type="radio" id="star1" name="rating" value="1">
+                        <label for="star1" title="1 — Poor">★</label>
+                    </div>
+                    <div class="rating-hint">Click a star to rate your stay</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="comment">Your Comment</label>
+                    <textarea
+                        name="comment"
+                        id="comment"
+                        class="form-control"
+                        placeholder="Tell us about your experience… (min 10 characters)"
+                        minlength="10"
+                        required
+                        oninput="document.getElementById('charCount').textContent = this.value.length + ' characters'"
+                    ></textarea>
+                    <div class="char-count" id="charCount">0 characters</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" onclick="return validateFeedback()">Submit Feedback</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function validateFeedback() {
+    const rating = document.querySelector('input[name="rating"]:checked');
+    if (!rating) {
+        alert('Please select a star rating.');
+        return false;
+    }
+    const comment = document.getElementById('comment').value.trim();
+    if (comment.length < 10) {
+        alert('Comment must be at least 10 characters.');
+        return false;
+    }
+    return true;
+}
+</script>
+{% endblock %}

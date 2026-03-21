@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block title %}Rooms — Tulunad Homestay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .rooms-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+    }
+
+    .room-card {
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), box-shadow 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+    .room-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0,0,0,0.14);
+    }
+
+    .room-card-img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .room-card-body {
+        padding: 20px;
+    }
+
+    .room-card-name {
+        font-family: 'Nunito', sans-serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 6px;
+    }
+
+    .room-card-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .room-card-price {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+    .room-card-price span {
+        font-size: 0.8rem;
+        font-weight: 400;
+        color: var(--text-muted);
+    }
+
+    .room-card-capacity {
+        font-size: 0.875rem;
+        color: var(--text-light);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .room-card-desc {
+        font-size: 0.875rem;
+        color: var(--text-light);
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 16px;
+    }
+
+    .room-card-action {
+        display: flex;
+    }
+
+    /* Tablet */
+    @media (max-width: 900px) {
+        .rooms-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* Mobile */
+    @media (max-width: 640px) {
+        .rooms-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header mt-4">
+        <h2>Available Rooms</h2>
+        <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline btn-sm">← Dashboard</a>
+    </div>
+
+    {% if rooms %}
+        <div class="rooms-grid">
+            {% for room in rooms %}
+            <div class="room-card">
+                <img
+                    src="{{ room['image_url'] }}"
+                    alt="{{ room['room_name'] }}"
+                    class="room-card-img"
+                    loading="lazy"
+                    onerror="this.src='https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800'"
+                >
+                <div class="room-card-body">
+                    <div class="room-card-name">{{ room['room_name'] }}</div>
+
+                    <div class="room-card-meta">
+                        <div class="room-card-price">
+                            ₹{{ "%.0f"|format(room['price']) }} <span>/ night</span>
+                        </div>
+                        <div class="room-card-capacity">
+                            👥 {{ room['capacity'] }} guests
+                        </div>
+                    </div>
+
+                    <div class="room-card-desc">{{ room['description'] }}</div>
+
+                    <div class="room-card-action">
+                        <a href="{{ url_for('user.book_room', room_id=room['id']) }}" class="btn btn-primary btn-sm btn-block">Book Now</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center mt-4" style="padding:60px 0;">
+            <p style="font-size:2rem; margin-bottom:8px;">🏡</p>
+            <p class="text-muted">No rooms are currently available. Please check back later.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

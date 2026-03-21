@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}My Bookings — Tulunad Homestay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .bookings-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .bookings-table {
+        width: 100%;
+        min-width: 740px;
+        border-collapse: collapse;
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+    }
+    .bookings-table thead { background: var(--bg-alt); }
+    .bookings-table th {
+        text-align: left;
+        padding: 14px 18px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-light);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+    }
+    .bookings-table td {
+        padding: 16px 18px;
+        font-size: 0.9rem;
+        border-bottom: 1px solid var(--border-light);
+        color: var(--text);
+        vertical-align: middle;
+    }
+    .bookings-table tr:last-child td { border-bottom: none; }
+    .bookings-table tr:hover td { background: var(--bg); }
+
+    /* Status pills */
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 14px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+    }
+    .status-pending  { background: #FDF6E3; color: #B8903D; }
+    .status-confirmed { background: #EDF7EF; color: #3A6347; }
+    .status-cancelled { background: #FDEDEB; color: #C0392B; }
+
+    .btn-feedback {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 14px;
+        border-radius: var(--radius-sm);
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all var(--transition);
+        white-space: nowrap;
+    }
+    .btn-feedback:hover {
+        background: var(--accent-dark);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .feedback-done {
+        font-size: 0.8rem;
+        color: var(--success);
+        font-weight: 600;
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+    }
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 16px;
+        display: block;
+    }
+    .empty-title {
+        font-family: 'Nunito', sans-serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 8px;
+    }
+    .empty-desc {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        margin-bottom: 24px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header mt-4">
+        <h2>My Bookings</h2>
+        <a href="{{ url_for('user.rooms') }}" class="btn btn-primary btn-sm">+ New Booking</a>
+    </div>
+
+    {% if bookings %}
+        <div class="bookings-table-wrap">
+            <table class="bookings-table">
+                <thead>
+                    <tr>
+                        <th>Room Name</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Meal</th>
+                        <th>Fire Camp</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in bookings %}
+                    <tr>
+                        <td style="font-weight:600;">{{ b['room_name'] }}</td>
+                        <td>📅 {{ b['checkin_date'] }}</td>
+                        <td>📅 {{ b['checkout_date'] }}</td>
+                        <td>{{ '🥬' if b['meal_type'] == 'Veg' else '🍗' }} {{ b['meal_type'] }}</td>
+                        <td>{{ '🔥 Yes' if b['fire_camp'] == 'Yes' else 'No' }}</td>
+                        <td>
+                            {% if b['status'] == 'Confirmed' %}
+                                <span class="status-pill status-confirmed">Confirmed</span>
+                            {% elif b['status'] == 'Cancelled' %}
+                                <span class="status-pill status-cancelled">Cancelled</span>
+                            {% else %}
+                                <span class="status-pill status-pending">{{ b['status'] }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if b['status'] == 'Confirmed' and not b['has_feedback'] %}
+                                <a href="{{ url_for('user.feedback', booking_id=b['id']) }}" class="btn-feedback">⭐ Leave Feedback</a>
+                            {% elif b['has_feedback'] %}
+                                <span class="feedback-done">✅ Feedback Given</span>
+                            {% else %}
+                                <span style="color:var(--text-muted); font-size:0.8rem;">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <span class="empty-icon">🏡</span>
+            <div class="empty-title">No bookings yet</div>
+            <div class="empty-desc">You haven't made any reservations. Start by exploring our cozy forest homestay rooms!</div>
+            <a href="{{ url_for('user.rooms') }}" class="btn btn-primary">Browse Rooms</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
