@@ -1,8 +1,27 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+import os
+import uuid
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from helpers import admin_required
 from database import get_db
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+
+def _allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def _save_upload(file_obj):
+    """Save an uploaded file and return its URL path, or None on failure."""
+    if file_obj and file_obj.filename and _allowed_file(file_obj.filename):
+        ext = file_obj.filename.rsplit('.', 1)[1].lower()
+        unique_name = f"{uuid.uuid4().hex}.{ext}"
+        save_path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_name)
+        file_obj.save(save_path)
+        return f"/static/uploads/rooms/{unique_name}"
+    return None
 
 
 # ── Dashboard ────────────────────────────────────────────────
@@ -47,15 +66,44 @@ def add_room():
         price = request.form['price']
         capacity = request.form['capacity']
         description = request.form.get('description', '')
-        image_url = request.form.get('image_url', '')
         availability = 1 if request.form.get('availability') else 0
 
+        # Cover image: prefer uploaded file, fall back to URL
+        cover_url = _save_upload(request.files.get('cover_image'))
+        if not cover_url:
+            cover_url = request.form.get('image_url', '').strip()
+
         db = get_db()
-        db.execute(
+        cursor = db.execute(
             '''INSERT INTO rooms (room_name, price, capacity, description, image_url, availability)
                VALUES (?, ?, ?, ?, ?, ?)''',
-            (room_name, float(price), int(capacity), description, image_url, availability),
+            (room_name, float(price), int(capacity), description, cover_url, availability),
         )
+        new_room_id = cursor.lastrowid
+
+        # Gallery images: uploaded files
+        gallery_files = request.files.getlist('gallery_files')
+        sort_idx = 0
+        for f in gallery_files:
+            saved = _save_upload(f)
+            if saved:
+                db.execute(
+                    'INSERT INTO room_images (room_id, image_url, sort_order) VALUES (?, ?, ?)',
+                    (new_room_id, saved, sort_idx),
+                )
+                sort_idx += 1
+
+        # Gallery images: URL inputs
+        extra_images = request.form.getlist('extra_images')
+        for img_url in extra_images:
+            img_url = img_url.strip()
+            if img_url:
+                db.execute(
+                    'INSERT INTO room_images (room_id, image_url, sort_order) VALUES (?, ?, ?)',
+                    (new_room_id, img_url, sort_idx),
+                )
+                sort_idx += 1
+
         db.commit()
 
         flash('Room added successfully!', 'success')
@@ -80,21 +128,71 @@ def edit_room(room_id):
         price = request.form['price']
         capacity = request.form['capacity']
         description = request.form.get('description', '')
-        image_url = request.form.get('image_url', '')
         availability = 1 if request.form.get('availability') else 0
+
+        # Cover image: prefer new upload, then URL input, then keep existing
+        cover_url = _save_upload(request.files.get('cover_image'))
+        if not cover_url:
+            cover_url = request.form.get('image_url', '').strip()
+        if not cover_url:
+            cover_url = room['image_url'] or ''
 
         db.execute(
             '''UPDATE rooms
                SET room_name = ?, price = ?, capacity = ?, description = ?, image_url = ?, availability = ?
                WHERE id = ?''',
-            (room_name, float(price), int(capacity), description, image_url, availability, room_id),
+            (room_name, float(price), int(capacity), description, cover_url, availability, room_id),
         )
+
+        # Replace gallery images: delete old, insert new
+        db.execute('DELETE FROM room_images WHERE room_id = ?', (room_id,))
+
+        sort_idx = 0
+
+        # Keep existing images the user didn't remove
+        keep_images = request.form.getlist('keep_images')
+        for img_url in keep_images:
+            img_url = img_url.strip()
+            if img_url:
+                db.execute(
+                    'INSERT INTO room_images (room_id, image_url, sort_order) VALUES (?, ?, ?)',
+                    (room_id, img_url, sort_idx),
+                )
+                sort_idx += 1
+
+        # New uploaded files
+        gallery_files = request.files.getlist('gallery_files')
+        for f in gallery_files:
+            saved = _save_upload(f)
+            if saved:
+                db.execute(
+                    'INSERT INTO room_images (room_id, image_url, sort_order) VALUES (?, ?, ?)',
+                    (room_id, saved, sort_idx),
+                )
+                sort_idx += 1
+
+        # New URL inputs
+        extra_images = request.form.getlist('extra_images')
+        for img_url in extra_images:
+            img_url = img_url.strip()
+            if img_url:
+                db.execute(
+                    'INSERT INTO room_images (room_id, image_url, sort_order) VALUES (?, ?, ?)',
+                    (room_id, img_url, sort_idx),
+                )
+                sort_idx += 1
+
         db.commit()
 
         flash('Room updated successfully!', 'success')
         return redirect(url_for('admin.rooms'))
 
-    return render_template('admin/edit_room.html', room=room)
+    # Fetch existing gallery images for this room
+    images = db.execute(
+        'SELECT * FROM room_images WHERE room_id = ? ORDER BY sort_order', (room_id,)
+    ).fetchall()
+
+    return render_template('admin/edit_room.html', room=room, images=images)
 
 
 # ── Rooms — Delete ───────────────────────────────────────────
@@ -102,7 +200,18 @@ def edit_room(room_id):
 @admin_required
 def delete_room(room_id):
     db = get_db()
+
+    # Delete in dependency order: feedback → bookings → room_images → room
+    # (bookings and feedback FKs lack ON DELETE CASCADE)
+    db.execute('''
+        DELETE FROM feedback WHERE booking_id IN (
+            SELECT id FROM bookings WHERE room_id = ?
+        )
+    ''', (room_id,))
+    db.execute('DELETE FROM bookings WHERE room_id = ?', (room_id,))
+    db.execute('DELETE FROM room_images WHERE room_id = ?', (room_id,))
     db.execute('DELETE FROM rooms WHERE id = ?', (room_id,))
+
     db.commit()
     flash('Room deleted.', 'info')
     return redirect(url_for('admin.rooms'))

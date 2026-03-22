@@ -15,7 +15,10 @@
     <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-inner">
-            <a class="navbar-brand" href="{{ url_for('home') }}">🌿 Tulunad Homestay</a>
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='images/TulunadLogo.png') }}" alt="Tulunad Logo">
+                Tulunad Homestay
+            </a>
 
             <button class="navbar-toggle" onclick="document.getElementById('navLinks').classList.toggle('active')" aria-label="Toggle navigation">☰</button>
 
@@ -62,7 +65,10 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2025 Tulunad Homestay · Udupi, Karnataka</p>
+        <p>&copy; 2025 Tulunad Homestay · Mangaluru &middot; Udupi, Karnataka</p>
+        <p style="color: white; font-size: 10px;">
+  Contact us: +91 9480762153 | info@tulunadhomestay.com
+</p>
     </footer>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>

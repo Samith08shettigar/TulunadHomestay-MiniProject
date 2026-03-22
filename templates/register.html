@@ -10,14 +10,32 @@
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+        
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(160deg, #f5f0e8 0%, #e8f0e5 40%, #f0ebe3 100%);
+            position: relative;
+            background-image: url("{{ url_for('static', filename='images/moolatulunad.jpg') }}");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 24px;
+            z-index: 1;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            /* adjust opacity here (0.0 - 1.0) */
+            z-index: -1;
         }
 
         .auth-container {
@@ -38,10 +56,10 @@
             gap: 8px;
             animation: slideDown 0.3s ease-out;
         }
-        .flash-success { background: #edf7ef; color: #3a6347; border-left: 4px solid #4A7C59; }
-        .flash-danger  { background: #fdedeb; color: #c0392b; border-left: 4px solid #c0392b; }
-        .flash-info    { background: #e8f4f8; color: #2e86ab; border-left: 4px solid #2e86ab; }
-        .flash-warning { background: #fdf6e3; color: #b8903d; border-left: 4px solid #D4A853; }
+        .flash-success { background: #E8F5E9; color: #2E6B3E; border-left: 4px solid #2E6B3E; }
+        .flash-danger  { background: #FDEDEB; color: #C1502E; border-left: 4px solid #C1502E; }
+        .flash-info    { background: #E3F2F8; color: #2E6D8E; border-left: 4px solid #2E6D8E; }
+        .flash-warning { background: #FDF6E3; color: #B8882A; border-left: 4px solid #D4A03C; }
 
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-8px); }
@@ -52,14 +70,21 @@
         .auth-card {
             background: #fff;
             border-radius: 20px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 24px rgba(44, 26, 14, 0.10), 0 1px 4px rgba(44, 26, 14, 0.05);
             padding: 44px 36px 36px;
+            border-top: 4px solid #D4A03C;
         }
 
         .auth-logo {
             text-align: center;
-            margin-bottom: 8px;
-            font-size: 2.2rem;
+            margin-bottom: 12px;
+        }
+        .auth-logo img {
+            width: 175px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto;
         }
 
         .auth-title {
@@ -67,14 +92,14 @@
             text-align: center;
             font-size: 1.55rem;
             font-weight: 800;
-            color: #2D2D2D;
+            color: #5B3A1A;
             margin-bottom: 4px;
         }
 
         .auth-subtitle {
             text-align: center;
             font-size: 0.9rem;
-            color: #9B9B9B;
+            color: #9A887A;
             margin-bottom: 28px;
         }
 
@@ -88,7 +113,7 @@
             display: block;
             font-size: 0.8rem;
             font-weight: 600;
-            color: #4A4A4A;
+            color: #5B3A1A;
             margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.4px;
@@ -104,38 +129,38 @@
             top: 50%;
             transform: translateY(-50%);
             font-size: 1rem;
-            color: #9B9B9B;
+            color: #9A887A;
             pointer-events: none;
         }
 
         .input-wrapper input {
             width: 100%;
             padding: 13px 16px 13px 42px;
-            border: 1.5px solid #E8E6E1;
+            border: 1.5px solid #E8DDD0;
             border-radius: 12px;
             font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
-            color: #2D2D2D;
-            background: #FAFAF8;
+            color: #2C1A0E;
+            background: #FBF7F0;
             outline: none;
             transition: border-color 0.25s, box-shadow 0.25s;
         }
         .input-wrapper input:focus {
-            border-color: #4A7C59;
-            box-shadow: 0 0 0 3px rgba(74,124,89,0.1);
+            border-color: #D4A03C;
+            box-shadow: 0 0 0 3px rgba(212, 160, 60, 0.15);
             background: #fff;
         }
         .input-wrapper input::placeholder { color: #BCBCBC; }
 
         /* Error state */
         .input-wrapper input.input-error {
-            border-color: #c0392b;
-            box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+            border-color: #C1502E;
+            box-shadow: 0 0 0 3px rgba(193, 80, 46, 0.1);
         }
 
         .error-text {
             font-size: 0.8rem;
-            color: #c0392b;
+            color: #C1502E;
             margin-top: 6px;
             display: none;
             font-weight: 500;
@@ -147,7 +172,7 @@
             padding: 14px;
             border: none;
             border-radius: 12px;
-            background: #4A7C59;
+            background: linear-gradient(135deg, #5B3A1A 0%, #7A5230 100%);
             color: #fff;
             font-family: 'Inter', sans-serif;
             font-size: 1rem;
@@ -157,9 +182,9 @@
             margin-top: 6px;
         }
         .btn-register:hover {
-            background: #3a6347;
+            background: linear-gradient(135deg, #3E2710 0%, #5B3A1A 100%);
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(74,124,89,0.25);
+            box-shadow: 0 6px 20px rgba(91, 58, 26, 0.25);
         }
         .btn-register:active {
             transform: translateY(0);
@@ -169,14 +194,15 @@
             text-align: center;
             margin-top: 22px;
             font-size: 0.9rem;
-            color: #6B6B6B;
+            color: #6B5344;
         }
         .auth-footer a {
-            color: #4A7C59;
+            color: #5B3A1A;
             font-weight: 600;
             text-decoration: none;
         }
         .auth-footer a:hover {
+            color: #D4A03C;
             text-decoration: underline;
         }
 
@@ -184,7 +210,14 @@
             text-align: center;
             margin-top: 24px;
             font-size: 0.8rem;
-            color: #BCBCBC;
+            color: #9A887A;
+        }
+        .auth-decor img {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-right: 4px;
         }
 
         @media (max-width: 480px) {
@@ -207,9 +240,11 @@
         {% endwith %}
 
         <div class="auth-card">
-            <div class="auth-logo">🌿</div>
+            <div class="auth-logo">
+                <img src="{{ url_for('static', filename='images/TulunadLogo.png') }}" alt="Tulunad Logo">
+            </div>
             <h1 class="auth-title">Create Account</h1>
-            <p class="auth-subtitle">Join Tulunad Homestay for a nature retreat</p>
+            <p class="auth-subtitle">Join Tulunad Homestay for a cultural retreat</p>
 
             <form method="POST" action="{{ url_for('auth.register') }}" id="registerForm">
                 <div class="input-group">
@@ -253,7 +288,10 @@
             </p>
         </div>
 
-        <p class="auth-decor">🌿 Tulunad Homestay · Udupi, Karnataka</p>
+        <p class="auth-decor">
+            <img src="{{ url_for('static', filename='images/TulunadLogo.png') }}" alt="Tulunad Logo">
+            Tulunad Homestay · Mangaluru · Udupi, Karnataka
+        </p>
     </div>
 
     <script>

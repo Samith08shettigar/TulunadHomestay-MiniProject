@@ -9,7 +9,7 @@
     </div>
 
     <div class="form-card">
-        <form method="POST" action="{{ url_for('admin.add_room') }}">
+        <form method="POST" action="{{ url_for('admin.add_room') }}" enctype="multipart/form-data">
             <div class="form-group">
                 <label class="form-label" for="room_name">Room Name</label>
                 <input type="text" name="room_name" id="room_name" class="form-control" placeholder="e.g. Forest View Cottage" required>
@@ -31,9 +31,47 @@
                 <textarea name="description" id="description" class="form-control" placeholder="Describe the room, amenities, views…"></textarea>
             </div>
 
+            <!-- Cover Image -->
             <div class="form-group">
-                <label class="form-label" for="image_url">Image URL</label>
-                <input type="url" name="image_url" id="image_url" class="form-control" placeholder="https://images.unsplash.com/…">
+                <label class="form-label">Cover Image (shown on listing card)</label>
+                <div class="upload-option-group">
+                    <div class="upload-option">
+                        <label class="form-label form-label-sm">Upload from computer</label>
+                        <input type="file" name="cover_image" accept="image/*" class="form-control">
+                    </div>
+                    <div class="upload-divider">OR</div>
+                    <div class="upload-option">
+                        <label class="form-label form-label-sm">Paste image URL</label>
+                        <input type="url" name="image_url" class="form-control" placeholder="https://images.unsplash.com/…">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery Images -->
+            <div class="form-group">
+                <label class="form-label">Gallery Images</label>
+
+                <div class="gallery-upload-section">
+                    <label class="form-label form-label-sm">Upload from computer</label>
+                    <div id="file-uploads-container">
+                        <div class="file-upload-row">
+                            <input type="file" name="gallery_files" accept="image/*" multiple class="form-control" style="flex:1">
+                            <button type="button" class="btn btn-outline btn-sm file-upload-remove" title="Remove" style="margin-left:8px;color:var(--danger,#e74c3c);">✕</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline btn-sm" id="add-file-btn" style="margin-top:8px;">+ Add another file upload</button>
+                </div>
+
+                <div class="gallery-url-section" style="margin-top:12px;">
+                    <label class="form-label form-label-sm">Or add by URL</label>
+                    <div id="extra-images-container">
+                        <div class="extra-image-row">
+                            <input type="url" name="extra_images" class="form-control" placeholder="https://images.unsplash.com/…" style="flex:1">
+                            <button type="button" class="btn btn-outline btn-sm extra-img-remove" title="Remove" style="margin-left:8px;color:var(--danger,#e74c3c);">✕</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline btn-sm" id="add-image-btn" style="margin-top:8px;">+ Add another image URL</button>
+                </div>
             </div>
 
             <div class="form-group">
@@ -47,4 +85,86 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-option-group {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .upload-option {
+        flex: 1;
+        min-width: 200px;
+    }
+    .upload-divider {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-muted, #999);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .form-label-sm {
+        font-size: 0.8rem;
+        color: var(--text-muted, #888);
+        margin-bottom: 4px;
+    }
+    .extra-image-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .extra-image-row .form-control {
+        flex: 1;
+    }
+    .file-upload-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* File upload rows: add / remove */
+    const fileContainer = document.getElementById('file-uploads-container');
+    const addFileBtn = document.getElementById('add-file-btn');
+
+    addFileBtn.addEventListener('click', function () {
+        const row = document.createElement('div');
+        row.className = 'file-upload-row';
+        row.innerHTML =
+            '<input type="file" name="gallery_files" accept="image/*" multiple class="form-control" style="flex:1">' +
+            '<button type="button" class="btn btn-outline btn-sm file-upload-remove" title="Remove" style="margin-left:8px;color:var(--danger,#e74c3c);">✕</button>';
+        fileContainer.appendChild(row);
+    });
+
+    fileContainer.addEventListener('click', function (e) {
+        if (e.target.classList.contains('file-upload-remove')) {
+            e.target.closest('.file-upload-row').remove();
+        }
+    });
+
+    /* URL inputs: add / remove */
+    const container = document.getElementById('extra-images-container');
+    const addBtn = document.getElementById('add-image-btn');
+
+    addBtn.addEventListener('click', function () {
+        const row = document.createElement('div');
+        row.className = 'extra-image-row';
+        row.innerHTML =
+            '<input type="url" name="extra_images" class="form-control" placeholder="https://images.unsplash.com/…" style="flex:1">' +
+            '<button type="button" class="btn btn-outline btn-sm extra-img-remove" title="Remove" style="margin-left:8px;color:var(--danger,#e74c3c);">✕</button>';
+        container.appendChild(row);
+    });
+
+    container.addEventListener('click', function (e) {
+        if (e.target.classList.contains('extra-img-remove')) {
+            e.target.closest('.extra-image-row').remove();
+        }
+    });
+</script>
 {% endblock %}

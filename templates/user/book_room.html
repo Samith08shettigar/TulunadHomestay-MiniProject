@@ -19,11 +19,56 @@
         position: sticky;
         top: 88px;
     }
-    .room-summary img {
+
+    /* ── Image Gallery ─────────────────────────── */
+    .gallery {
+        position: relative;
+        width: 100%;
+        background: #0b0b0b;
+    }
+    .gallery-main {
+        width: 100%;
+        height: 280px;
+        object-fit: cover;
+        display: block;
+        transition: opacity 0.3s ease;
+    }
+    .gallery-main.fade-out {
+        opacity: 0;
+    }
+    .gallery-thumbs {
+        display: flex;
+        gap: 6px;
+        padding: 8px 10px;
+        overflow-x: auto;
+        background: rgba(0,0,0,0.25);
+    }
+    .gallery-thumbs img {
+        width: 56px;
+        height: 42px;
+        object-fit: cover;
+        border-radius: 6px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        opacity: 0.6;
+        transition: opacity 0.25s ease, border-color 0.25s ease;
+        flex-shrink: 0;
+    }
+    .gallery-thumbs img:hover {
+        opacity: 0.85;
+    }
+    .gallery-thumbs img.active {
+        border-color: var(--primary, #f4845f);
+        opacity: 1;
+    }
+
+    /* Single cover image fallback (no gallery) */
+    .room-summary > img.cover-only {
         width: 100%;
         height: 220px;
         object-fit: cover;
     }
+
     .room-summary-body {
         padding: 24px;
     }
@@ -124,6 +169,7 @@
         }
         .room-summary { position: static; }
         .date-row { grid-template-columns: 1fr; }
+        .gallery-main { height: 220px; }
     }
 </style>
 {% endblock %}
@@ -138,11 +184,39 @@
     <div class="booking-layout">
         <!-- Room Summary -->
         <div class="room-summary">
+
+            {% if images %}
+            <!-- Image Gallery -->
+            <div class="gallery" id="roomGallery">
+                <img
+                    class="gallery-main"
+                    id="galleryMain"
+                    src="{{ images[0]['image_url'] }}"
+                    alt="{{ room['room_name'] }}"
+                    onerror="this.src='https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800'"
+                >
+                <div class="gallery-thumbs" id="galleryThumbs">
+                    {% for img in images %}
+                    <img
+                        src="{{ img['image_url'] }}"
+                        alt="Image {{ loop.index }}"
+                        data-full="{{ img['image_url'] }}"
+                        class="{{ 'active' if loop.first else '' }}"
+                        onerror="this.style.display='none'"
+                    >
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <!-- Fallback: single cover image -->
             <img
+                class="cover-only"
                 src="{{ room['image_url'] }}"
                 alt="{{ room['room_name'] }}"
                 onerror="this.src='https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800'"
             >
+            {% endif %}
+
             <div class="room-summary-body">
                 <div class="room-summary-name">{{ room['room_name'] }}</div>
                 <div class="room-summary-price">
@@ -221,6 +295,33 @@
 
 {% block extra_js %}
 <script>
+    /* ── Image Gallery Switcher ──────────────────── */
+    (function () {
+        const mainImg = document.getElementById('galleryMain');
+        const thumbs  = document.getElementById('galleryThumbs');
+        if (!mainImg || !thumbs) return;           // no gallery
+
+        thumbs.addEventListener('click', function (e) {
+            const thumb = e.target.closest('img');
+            if (!thumb) return;
+
+            const newSrc = thumb.getAttribute('data-full');
+            if (!newSrc || newSrc === mainImg.src) return;
+
+            // Fade out → swap → fade in
+            mainImg.classList.add('fade-out');
+            setTimeout(function () {
+                mainImg.src = newSrc;
+                mainImg.classList.remove('fade-out');
+            }, 300);
+
+            // Update active state
+            thumbs.querySelectorAll('img').forEach(function (t) { t.classList.remove('active'); });
+            thumb.classList.add('active');
+        });
+    })();
+
+    /* ── Price Calculator (unchanged logic) ────── */
     const pricePerNight = {{ room['price'] }};
     const checkinInput = document.getElementById('checkin_date');
     const checkoutInput = document.getElementById('checkout_date');

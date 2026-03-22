@@ -48,6 +48,12 @@ def book_room(room_id):
         flash('Room not found.', 'danger')
         return redirect(url_for('user.rooms'))
 
+    # Fetch gallery images for this room
+    images = db.execute(
+        'SELECT * FROM room_images WHERE room_id = ? ORDER BY sort_order',
+        (room_id,)
+    ).fetchall()
+
     if request.method == 'POST':
         checkin_date = request.form['checkin_date']
         checkout_date = request.form['checkout_date']
@@ -89,7 +95,7 @@ def book_room(room_id):
         return redirect(url_for('user.my_bookings'))
 
     today = date.today().isoformat()
-    return render_template('user/book_room.html', room=room, today=today)
+    return render_template('user/book_room.html', room=room, today=today, images=images)
 
 
 @user_bp.route('/my-bookings')

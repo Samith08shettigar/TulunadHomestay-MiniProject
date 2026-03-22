@@ -28,6 +28,16 @@ def create_tables():
     ''')
 
     db.execute('''
+        CREATE TABLE IF NOT EXISTS room_images (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            room_id    INTEGER NOT NULL,
+            image_url  TEXT NOT NULL,
+            sort_order INTEGER DEFAULT 0,
+            FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
+        )
+    ''')
+
+    db.execute('''
         CREATE TABLE IF NOT EXISTS bookings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,

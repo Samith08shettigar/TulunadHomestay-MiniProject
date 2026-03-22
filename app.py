@@ -13,6 +13,11 @@ def create_app():
 
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tulunad-homestay-secret-key')
 
+    # Upload folder for room images
+    upload_folder = os.path.join(app.static_folder, 'uploads', 'rooms')
+    app.config['UPLOAD_FOLDER'] = upload_folder
+    os.makedirs(upload_folder, exist_ok=True)
+
     # Ensure the instance folder exists (for homestay.db)
     os.makedirs(app.instance_path, exist_ok=True)
 
