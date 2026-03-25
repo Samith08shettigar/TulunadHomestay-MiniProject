@@ -1,0 +1,8 @@
+{
+    "source_directories": ["."],
+    "search_path": [
+        ".venv/Lib/site-packages"
+    ],
+    "site_package_search_strategy": "pep561",
+    "strict": false
+}

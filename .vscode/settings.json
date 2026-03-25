@@ -1,0 +1,10 @@
+{
+    "python.analysis.extraPaths": [
+        "."
+    ],
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingModuleSource": "none"
+    },
+    "python.analysis.typeCheckingMode": "off",
+    "python.languageServer": "Pylance"
+}

@@ -83,7 +83,7 @@ def add_room():
 
         # Gallery images: uploaded files
         gallery_files = request.files.getlist('gallery_files')
-        sort_idx = 0
+        sort_idx: int = 0
         for f in gallery_files:
             saved = _save_upload(f)
             if saved:
@@ -147,7 +147,7 @@ def edit_room(room_id):
         # Replace gallery images: delete old, insert new
         db.execute('DELETE FROM room_images WHERE room_id = ?', (room_id,))
 
-        sort_idx = 0
+        sort_idx: int = 0
 
         # Keep existing images the user didn't remove
         keep_images = request.form.getlist('keep_images')
