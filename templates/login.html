@@ -11,7 +11,6 @@
         href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <style>
-        /* Reset */
         *,
         *::before,
         *::after {
@@ -20,33 +19,36 @@
             box-sizing: border-box;
         }
 
-        /* Body with background image */
         body {
             font-family: 'Inter', sans-serif;
-            background: url("../static/images/hero-bg.png") no-repeat center center/cover;
+            position: relative;
+            background-image: url("{{ url_for('static', filename='images/moolatulunad.jpg') }}");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 24px;
-            position: relative;
+            z-index: 1;
         }
 
-        /* Overlay */
         body::before {
             content: "";
             position: absolute;
-            inset: 0;
-            background: rgba(44, 26, 14, 0.55);
-            z-index: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            /* adjust opacity here (0.0 - 1.0) */
+            z-index: -1;
         }
 
-        /* Container */
         .auth-container {
             width: 100%;
             max-width: 420px;
-            position: relative;
-            z-index: 1;
         }
 
         /* Flash messages */
@@ -103,36 +105,32 @@
             }
         }
 
-        /* Card (Glass Effect) */
+        /* Card */
         .auth-card {
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            background: #fff;
             border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 4px 24px rgba(44, 26, 14, 0.10), 0 1px 4px rgba(44, 26, 14, 0.05);
             padding: 44px 36px 36px;
             border-top: 4px solid #D4A03C;
         }
 
-        /* Logo */
         .auth-logo {
             text-align: center;
             margin-bottom: 12px;
         }
 
         .auth-logo img {
-            width: 72px;
-            height: 72px;
+            width: 175px;
+            height: 130px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #D4A03C;
+            margin: 0 auto;
         }
 
-        /* Title */
         .auth-title {
             font-family: 'Nunito', sans-serif;
             text-align: center;
-            font-size: 1.6rem;
+            font-size: 1.55rem;
             font-weight: 800;
             color: #5B3A1A;
             margin-bottom: 4px;
@@ -141,13 +139,14 @@
         .auth-subtitle {
             text-align: center;
             font-size: 0.9rem;
-            color: #6B5344;
+            color: #9A887A;
             margin-bottom: 28px;
         }
 
         /* Form */
         .input-group {
             margin-bottom: 18px;
+            position: relative;
         }
 
         .input-group label {
@@ -157,9 +156,9 @@
             color: #5B3A1A;
             margin-bottom: 6px;
             text-transform: uppercase;
+            letter-spacing: 0.4px;
         }
 
-        /* Input wrapper */
         .input-wrapper {
             position: relative;
         }
@@ -169,77 +168,83 @@
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
+            font-size: 1rem;
             color: #9A887A;
+            pointer-events: none;
         }
 
-        /* Inputs */
         .input-wrapper input {
             width: 100%;
             padding: 13px 16px 13px 42px;
-            border: 1.5px solid rgba(255, 255, 255, 0.6);
+            border: 1.5px solid #E8DDD0;
             border-radius: 12px;
+            font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
             color: #2C1A0E;
-            background: rgba(255, 255, 255, 0.85);
+            background: #FBF7F0;
             outline: none;
-            transition: 0.25s;
+            transition: border-color 0.25s, box-shadow 0.25s;
         }
 
         .input-wrapper input:focus {
             border-color: #D4A03C;
-            box-shadow: 0 0 0 3px rgba(212, 160, 60, 0.2);
+            box-shadow: 0 0 0 3px rgba(212, 160, 60, 0.15);
             background: #fff;
         }
 
         .input-wrapper input::placeholder {
-            color: #aaa;
+            color: #BCBCBC;
         }
 
-        /* Button */
         .btn-login {
             width: 100%;
             padding: 14px;
             border: none;
             border-radius: 12px;
-            background: linear-gradient(135deg, #5B3A1A, #7A5230);
+            background: linear-gradient(135deg, #5B3A1A 0%, #7A5230 100%);
             color: #fff;
+            font-family: 'Inter', sans-serif;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.3s;
+            transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
             margin-top: 6px;
         }
 
         .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(91, 58, 26, 0.4);
-            background: linear-gradient(135deg, #3E2710, #5B3A1A);
+            background: linear-gradient(135deg, #3E2710 0%, #5B3A1A 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(91, 58, 26, 0.25);
         }
 
-        /* Footer */
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
         .auth-footer {
             text-align: center;
             margin-top: 22px;
             font-size: 0.9rem;
-            color: #eee;
+            color: #6B5344;
         }
 
         .auth-footer a {
-            color: #FFD27F;
+            color: #5B3A1A;
             font-weight: 600;
             text-decoration: none;
         }
 
         .auth-footer a:hover {
+            color: #D4A03C;
             text-decoration: underline;
         }
 
-        /* Bottom text */
+        /* Earthy decoration */
         .auth-decor {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 24px;
             font-size: 0.8rem;
-            color: #ddd;
+            color: #9A887A;
         }
 
         .auth-decor img {
@@ -250,10 +255,13 @@
             margin-right: 4px;
         }
 
-        /* Responsive */
         @media (max-width: 480px) {
             .auth-card {
-                padding: 32px 24px;
+                padding: 32px 24px 28px;
+            }
+
+            body {
+                padding: 16px;
             }
         }
     </style>
@@ -274,7 +282,7 @@
 
         <div class="auth-card">
             <div class="auth-logo">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Tulunad Logo">
+                <img src="{{ url_for('static', filename='images/TulunadLogo.png') }}" alt="Tulunad Logo">
             </div>
             <h1 class="auth-title">Welcome Back</h1>
             <p class="auth-subtitle">Log in to Tulunad Homestay</p>
@@ -305,7 +313,7 @@
         </div>
 
         <p class="auth-decor">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="">
+            <img src="{{ url_for('static', filename='images/TulunadLogo.png') }}" alt="Tulunad Logo">
             Tulunad Homestay · Mangaluru · Udupi, Karnataka
         </p>
     </div>
