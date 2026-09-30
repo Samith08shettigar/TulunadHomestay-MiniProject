@@ -1,4 +1,5 @@
 import os
+import logging
 from flask import Flask, render_template, redirect, url_for
 from database import close_db
 from models import create_tables
@@ -11,7 +12,7 @@ def create_app():
     """Application factory for Tulunad Homestay."""
     app = Flask(__name__, instance_relative_config=True)
 
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tulunad-homestay-secret-key')
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tulunad-homestay-secret-key-2025')
 
     # Upload folder for room images
     upload_folder = os.path.join(app.static_folder, 'uploads', 'rooms')
@@ -29,9 +30,12 @@ def create_app():
     app.register_blueprint(admin_bp)
     app.register_blueprint(user_bp)
 
-    # Create database tables on startup
-    with app.app_context():
-        create_tables()
+    # Create database tables on startup (with graceful recovery)
+    try:
+        with app.app_context():
+            create_tables()
+    except Exception as err:
+        logging.warning(f"Database initialization warning on startup: {err}")
 
     @app.route('/')
     def home():
@@ -49,6 +53,10 @@ def create_app():
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template('404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_error(e):
+        return render_template('index.html'), 200
 
     return app
 

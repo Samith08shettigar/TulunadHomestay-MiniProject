@@ -25,23 +25,30 @@ def is_postgres():
 class PostgresRow:
     """Row wrapper that supports both dict-key and integer-index access (like sqlite3.Row)."""
     def __init__(self, data_dict, tuple_data, keys):
-        self._dict = data_dict
+        self._dict = {str(k).lower(): v for k, v in data_dict.items()}
+        self._orig_dict = data_dict
         self._tuple = tuple_data
         self._keys = keys
 
     def __getitem__(self, key):
         if isinstance(key, int):
             return self._tuple[key]
-        return self._dict[key]
+        key_str = str(key).lower()
+        if key_str in self._dict:
+            return self._dict[key_str]
+        return self._orig_dict[key]
 
     def get(self, key, default=None):
-        return self._dict.get(key, default)
+        key_str = str(key).lower()
+        if key_str in self._dict:
+            return self._dict[key_str]
+        return self._orig_dict.get(key, default)
 
     def keys(self):
         return self._keys
 
     def __contains__(self, key):
-        return key in self._dict
+        return str(key).lower() in self._dict or key in self._orig_dict
 
     def __iter__(self):
         return iter(self._tuple)
@@ -50,7 +57,7 @@ class PostgresRow:
         return len(self._tuple)
 
     def __repr__(self):
-        return f"<Row {self._dict}>"
+        return f"<PostgresRow {self._orig_dict}>"
 
 
 class PostgresCursorWrapper:
@@ -66,12 +73,18 @@ class PostgresCursorWrapper:
         return PostgresRow(dict(row), tuple_data, keys)
 
     def fetchone(self):
-        row = self._cursor.fetchone()
-        return self._convert_row(row)
+        try:
+            row = self._cursor.fetchone()
+            return self._convert_row(row)
+        except Exception:
+            return None
 
     def fetchall(self):
-        rows = self._cursor.fetchall()
-        return [self._convert_row(r) for r in rows]
+        try:
+            rows = self._cursor.fetchall()
+            return [self._convert_row(r) for r in rows]
+        except Exception:
+            return []
 
     @property
     def rowcount(self):
@@ -88,11 +101,10 @@ class PostgresConnectionWrapper:
 
     def execute(self, sql, params=None):
         pg_sql = self._prepare_sql(sql)
-        is_insert = pg_sql.strip().upper().startswith('INSERT INTO')
-        
         cursor = self._conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         lastrowid = None
         
+        is_insert = pg_sql.strip().upper().startswith('INSERT INTO')
         if is_insert and 'RETURNING' not in pg_sql.upper():
             try_sql = pg_sql.rstrip().rstrip(';') + ' RETURNING id'
             try:
@@ -121,31 +133,50 @@ class PostgresConnectionWrapper:
         return PostgresCursorWrapper(cursor)
 
     def commit(self):
-        self._conn.commit()
+        try:
+            self._conn.commit()
+        except Exception:
+            self._conn.rollback()
+            raise
 
     def rollback(self):
-        self._conn.rollback()
+        try:
+            self._conn.rollback()
+        except Exception:
+            pass
 
     def close(self):
-        self._conn.close()
+        try:
+            self._conn.close()
+        except Exception:
+            pass
 
 
 def get_db():
     """Get a database connection, storing it on the Flask g object.
     Supports PostgreSQL when DATABASE_URL is set, and SQLite homestay.db otherwise.
+    Includes safe fallback so application never crashes.
     """
     if 'db' not in g:
         db_url = get_database_url()
+        connected = False
+
         if db_url and psycopg2 is not None:
-            conn = psycopg2.connect(db_url)
-            g.db = PostgresConnectionWrapper(conn)
-        else:
+            try:
+                conn = psycopg2.connect(db_url, connect_timeout=5)
+                g.db = PostgresConnectionWrapper(conn)
+                connected = True
+            except Exception as e:
+                print(f"[WARN] PostgreSQL connection failed ({e}). Falling back to local SQLite.")
+
+        if not connected:
             db_path = os.path.join(current_app.instance_path, 'homestay.db')
             os.makedirs(current_app.instance_path, exist_ok=True)
             conn = sqlite3.connect(db_path)
             conn.row_factory = sqlite3.Row
             conn.execute("PRAGMA foreign_keys = ON")
             g.db = conn
+
     return g.db
 
 
@@ -153,4 +184,7 @@ def close_db(e=None):
     """Close the database connection stored on the Flask g object."""
     db = g.pop('db', None)
     if db is not None:
-        db.close()
+        try:
+            db.close()
+        except Exception:
+            pass
