@@ -85,7 +85,7 @@
 html {
     scroll-behavior: smooth;
     font-size: 16px;
-    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -96,10 +96,10 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow-x: hidden;
     width: 100%;
     position: relative;
     padding-bottom: 0;
+    -webkit-overflow-scrolling: touch;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -143,9 +143,7 @@ img {
 button, 
 .btn, 
 .nav-link, 
-.bottom-nav-item, 
-.room-card,
-.stat-card {
+.bottom-nav-item {
     touch-action: manipulation;
 }
 
@@ -162,7 +160,6 @@ button,
     padding: 32px 0 60px;
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
 }
 
 .section-header {

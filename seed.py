@@ -1,10 +1,11 @@
 from werkzeug.security import generate_password_hash
 from app import create_app
 from database import get_db
+from models import ALL_ROOMS_DATA
 
 
 def seed():
-    """Seed the database with an admin user and sample rooms."""
+    """Seed the database with default admin user and all 10 verified rooms with gallery images."""
     app = create_app()
 
     with app.app_context():
@@ -29,44 +30,39 @@ def seed():
         else:
             print('[INFO] Admin user already exists, skipping.')
 
-        # --- Sample Rooms ---
-        existing_rooms = db.execute('SELECT COUNT(*) FROM rooms').fetchone()[0]
+        # --- Seed All 10 Rooms ---
+        existing_rooms = db.execute('SELECT COUNT(*) FROM rooms').fetchone()
+        room_count = existing_rooms[0] if existing_rooms else 0
 
-        if existing_rooms == 0:
-            rooms = [
-                (
-                    'Forest View Cottage',
-                    2500.0,
-                    2,
-                    'A cozy cottage nestled among lush green forests with a breathtaking view of the Western Ghats. Perfect for couples seeking a peaceful retreat.',
-                    'https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=800',
-                    1
-                ),
-                (
-                    'Riverside Bamboo Hut',
-                    3500.0,
-                    4,
-                    'A spacious bamboo hut by the river, surrounded by tropical greenery. Wake up to the sounds of flowing water and birdsong.',
-                    'https://images.unsplash.com/photo-1499696010180-025ef6e1a8f9?w=800',
-                    1
-                ),
-                (
-                    'Treetop Nature Lodge',
-                    4500.0,
-                    6,
-                    'An elevated lodge offering panoramic views of the dense forest canopy. Ideal for families and groups looking for an adventurous stay.',
-                    'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800',
-                    1
-                ),
-            ]
+        if room_count == 0:
+            for item in ALL_ROOMS_DATA:
+                cursor = db.execute(
+                    '''INSERT INTO rooms (room_name, price, capacity, description, image_url, availability)
+                       VALUES (?, ?, ?, ?, ?, ?)''',
+                    (
+                        item["room_name"],
+                        item["price"],
+                        item["capacity"],
+                        item["description"],
+                        item["image_url"],
+                        item["availability"]
+                    )
+                )
+                room_id = cursor.lastrowid
+                if not room_id:
+                    r = db.execute('SELECT id FROM rooms WHERE room_name = ?', (item["room_name"],)).fetchone()
+                    if r:
+                        room_id = r[0] if isinstance(r, (tuple, list)) else r["id"]
 
-            db.executemany(
-                'INSERT INTO rooms (room_name, price, capacity, description, image_url, availability) VALUES (?, ?, ?, ?, ?, ?)',
-                rooms
-            )
-            print('[OK] 3 sample rooms created.')
+                if room_id and "gallery" in item:
+                    for sort_idx, g_img in enumerate(item["gallery"]):
+                        db.execute(
+                            'INSERT INTO room_images (room_id, image_url, sort_order) VALUES (?, ?, ?)',
+                            (room_id, g_img, sort_idx)
+                        )
+            print(f'[OK] All {len(ALL_ROOMS_DATA)} rooms and gallery images seeded successfully.')
         else:
-            print(f'[INFO] {existing_rooms} room(s) already exist, skipping.')
+            print(f'[INFO] {room_count} room(s) already exist, skipping.')
 
         db.commit()
         print('[DONE] Seeding complete!')
