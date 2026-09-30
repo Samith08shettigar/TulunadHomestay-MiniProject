@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, session
 from database import close_db
 from models import create_tables
 from blueprints.auth import auth_bp
@@ -45,6 +45,15 @@ def create_app():
     def login():
         return redirect(url_for('auth.login'))
 
+    @app.route('/feedback')
+    @app.route('/feedbacks')
+    def feedback_redirect():
+        if session.get('role') == 'admin':
+            return redirect(url_for('admin.feedback'))
+        if session.get('user_id'):
+            return redirect(url_for('user.my_bookings'))
+        return redirect(url_for('auth.login'))
+
     # ── Error Handlers ───────────────────────────────────────
     @app.errorhandler(403)
     def forbidden(e):
@@ -56,7 +65,8 @@ def create_app():
 
     @app.errorhandler(500)
     def internal_error(e):
-        return render_template('index.html'), 200
+        logging.exception("Unhandled server error: %s", e)
+        return render_template('500.html'), 500
 
     return app
 

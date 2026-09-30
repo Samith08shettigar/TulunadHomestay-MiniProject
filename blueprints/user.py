@@ -99,6 +99,7 @@ def book_room(room_id):
 
 
 @user_bp.route('/my-bookings')
+@user_bp.route('/my_bookings')
 @login_required
 def my_bookings():
     db = get_db()

@@ -22,7 +22,8 @@
             </div>
             <div class="stat-label">Average Homestay Rating</div>
             <div class="stars mt-1" style="font-size:1.25rem;">
-                {% for i in range(avg_rating | int) %}★{% endfor %}{% for i in range(5 - (avg_rating | int)) %}☆{% endfor %}
+                {% set avg_stars = (avg_rating | default(0) | int) %}
+                {% for i in range(avg_stars) %}★{% endfor %}{% for i in range(5 - avg_stars) %}☆{% endfor %}
             </div>
         </div>
 
@@ -65,10 +66,11 @@
                         </div>
                     </td>
                     <td data-label="Rating">
+                        {% set r_val = (fb['rating'] | default(5) | int) %}
                         <span class="stars">
-                            {% for i in range(fb['rating']) %}★{% endfor %}{% for i in range(5 - fb['rating']) %}☆{% endfor %}
+                            {% for i in range(r_val) %}★{% endfor %}{% for i in range(5 - r_val) %}☆{% endfor %}
                         </span>
-                        <span style="font-weight:700; font-size:0.85rem; margin-left:4px;">({{ fb['rating'] }}/5)</span>
+                        <span style="font-weight:700; font-size:0.85rem; margin-left:4px;">({{ r_val }}/5)</span>
                     </td>
                     <td data-label="Comment">
                         <p style="font-size:0.9rem; line-height:1.5; color:var(--text); max-width:400px; margin:0;">
@@ -77,7 +79,7 @@
                     </td>
                     <td data-label="Submitted">
                         <span style="font-size:0.85rem; color:var(--text-muted);">
-                            {{ fb['created_at'][:10] if fb['created_at'] else '—' }}
+                            {{ (fb['created_at']|string)[:10] if fb['created_at'] else '—' }}
                         </span>
                     </td>
                 </tr>

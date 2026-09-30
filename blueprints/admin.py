@@ -255,6 +255,7 @@ def update_booking(booking_id):
 
 # ── Feedback — List ──────────────────────────────────────────
 @admin_bp.route('/feedback')
+@admin_bp.route('/feedbacks')
 @admin_required
 def feedback():
     db = get_db()
@@ -268,10 +269,21 @@ def feedback():
            ORDER BY f.created_at DESC'''
     ).fetchall()
 
-    # Compute average rating
+    # Compute average rating safely for both PostgreSQL & SQLite
     avg_row = db.execute('SELECT AVG(rating) AS avg_rating, COUNT(*) AS total FROM feedback').fetchone()
-    avg_rating = round(avg_row['avg_rating'], 1) if avg_row['avg_rating'] else 0
-    total_reviews = avg_row['total']
+    avg_rating = 0.0
+    total_reviews = 0
+    if avg_row:
+        if avg_row['avg_rating'] is not None:
+            try:
+                avg_rating = round(float(avg_row['avg_rating']), 1)
+            except (ValueError, TypeError):
+                avg_rating = 0.0
+        if avg_row['total'] is not None:
+            try:
+                total_reviews = int(avg_row['total'])
+            except (ValueError, TypeError):
+                total_reviews = 0
 
     return render_template(
         'admin/feedback.html',
