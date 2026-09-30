@@ -5,4 +5,4 @@ nixPkgs = ["python311"]
 cmds = ["pip install -r requirements.txt"]
 
 [start]
-cmd = "gunicorn app:app"
+cmd = "python init_db.py && gunicorn app:app"
