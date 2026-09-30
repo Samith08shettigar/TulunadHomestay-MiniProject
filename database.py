@@ -18,7 +18,12 @@ def get_database_url():
 
 
 def is_postgres():
-    """Return True if PostgreSQL DATABASE_URL is configured."""
+    """Return True if PostgreSQL DATABASE_URL is configured and active."""
+    try:
+        if 'db' in g and g.db is not None:
+            return isinstance(g.db, PostgresConnectionWrapper)
+    except Exception:
+        pass
     return bool(get_database_url() and psycopg2 is not None)
 
 
