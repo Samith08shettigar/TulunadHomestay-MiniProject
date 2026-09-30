@@ -19,4 +19,4 @@ COPY . .
 EXPOSE 5000
 
 # Run with Gunicorn dynamically binding to $PORT provided by Railway
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 4 app:app"]
+CMD ["sh", "-c", "python init_db.py && gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 2 app:app"]

@@ -76,5 +76,28 @@ app = create_app()
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() in ('true', '1', 't')
-    app.run(host='0.0.0.0', port=port, debug=debug_mode)
+    if os.environ.get('RAILWAY_ENVIRONMENT') or (os.environ.get('DATABASE_URL') and not os.environ.get('FLASK_DEBUG')):
+        import sys
+        import subprocess
+        # Initialize database tables and seed verified data
+        try:
+            from init_db import init_database
+            init_database()
+        except Exception as e:
+            logging.error(f"Startup init_db notice: {e}")
+
+        # Start Gunicorn WSGI server for production
+        try:
+            cmd = ['gunicorn', '--bind', f'0.0.0.0:{port}', '--workers', '2', 'app:app']
+            logging.info("Starting production Gunicorn WSGI server: %s", " ".join(cmd))
+            if os.name != 'nt':
+                os.execvp('gunicorn', cmd)
+            else:
+                subprocess.run(cmd)
+                sys.exit(0)
+        except Exception as e:
+            logging.warning("Gunicorn execution fallback: %s. Using Flask server.", e)
+            app.run(host='0.0.0.0', port=port, debug=False)
+    else:
+        debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() in ('true', '1', 't')
+        app.run(host='0.0.0.0', port=port, debug=debug_mode)

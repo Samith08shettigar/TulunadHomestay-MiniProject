@@ -159,22 +159,23 @@ class PostgresConnectionWrapper:
 
 def get_db():
     """Get a database connection, storing it on the Flask g object.
-    Supports PostgreSQL when DATABASE_URL is set, and SQLite homestay.db otherwise.
-    Includes safe fallback so application never crashes.
+    Connects to PostgreSQL when DATABASE_URL is set, and SQLite homestay.db locally.
+    Does NOT silently fall back to SQLite when DATABASE_URL is configured.
     """
     if 'db' not in g:
         db_url = get_database_url()
-        connected = False
 
-        if db_url and psycopg2 is not None:
+        if db_url:
+            if psycopg2 is None:
+                raise RuntimeError("DATABASE_URL is configured but psycopg2 is not installed.")
             try:
-                conn = psycopg2.connect(db_url, connect_timeout=5)
+                conn = psycopg2.connect(db_url, connect_timeout=10)
                 g.db = PostgresConnectionWrapper(conn)
-                connected = True
             except Exception as e:
-                print(f"[WARN] PostgreSQL connection failed ({e}). Falling back to local SQLite.")
-
-        if not connected:
+                masked_target = db_url.split('@')[-1] if '@' in db_url else 'configured'
+                print(f"[ERROR] Failed to connect to PostgreSQL at {masked_target}: {e}")
+                raise e
+        else:
             db_path = os.path.join(current_app.instance_path, 'homestay.db')
             os.makedirs(current_app.instance_path, exist_ok=True)
             conn = sqlite3.connect(db_path)
