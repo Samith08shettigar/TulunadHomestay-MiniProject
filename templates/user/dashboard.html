@@ -1,37 +1,134 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard — Tulunad Homestay{% endblock %}
+{% block title %}Guest Dashboard — Tulunad Homestay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-welcome-banner {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        border-radius: var(--radius-xl);
+        padding: 32px 28px;
+        color: #FFFFFF;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        border: 1px solid rgba(212, 160, 60, 0.3);
+    }
+
+    .dashboard-welcome-banner h2 {
+        color: var(--accent-light);
+        margin-bottom: 4px;
+    }
+
+    .dashboard-welcome-banner p {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 0.95rem;
+    }
+
+    .dash-action-card {
+        background: var(--bg-surface);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-light);
+        transition: all var(--ease-standard);
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .dash-action-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--accent);
+    }
+
+    .dash-action-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-md);
+        background: var(--bg-alt);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        flex-shrink: 0;
+        border: 1px solid var(--border);
+    }
+
+    .dash-action-info .title {
+        font-weight: 800;
+        font-size: 1.1rem;
+        color: var(--primary);
+        margin-bottom: 2px;
+    }
+
+    .dash-action-info .desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    @media (max-width: 640px) {
+        .dashboard-welcome-banner {
+            padding: 22px 18px;
+            border-radius: var(--radius-lg);
+        }
+        .dashboard-welcome-banner .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="section-header mt-4">
-        <h2>Welcome, {{ session.get('user_name') }} 👋</h2>
+    <!-- Welcome Header Banner -->
+    <div class="dashboard-welcome-banner">
+        <div>
+            <h2>Namaskara, {{ session.get('user_name') }}! 👋</h2>
+            <p>Welcome to your Puranat & Tulunad Homestay guest portal.</p>
+        </div>
+        <a href="{{ url_for('user.rooms') }}" class="btn btn-accent btn-sm">Browse Cottages →</a>
     </div>
 
+    <!-- Stats Grid -->
     <div class="grid-3 mb-4">
         <div class="stat-card">
             <div class="stat-number">{{ total_bookings }}</div>
-            <div class="stat-label">Total Bookings</div>
+            <div class="stat-label">Total Reservations</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ confirmed_bookings }}</div>
-            <div class="stat-label">Confirmed</div>
+        <div class="stat-card" style="border-left-color: var(--forest);">
+            <div class="stat-number" style="color: var(--forest);">{{ confirmed_bookings }}</div>
+            <div class="stat-label">Confirmed Stays</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-number text-accent">{{ total_bookings - confirmed_bookings }}</div>
-            <div class="stat-label">Pending / Other</div>
+        <div class="stat-card" style="border-left-color: var(--accent);">
+            <div class="stat-number" style="color: var(--accent-dark);">{{ total_bookings - confirmed_bookings }}</div>
+            <div class="stat-label">Pending / Processing</div>
         </div>
     </div>
 
+    <!-- Quick Navigation Tiles -->
+    <h3 style="margin-bottom: 16px; color: var(--primary);">Quick Actions</h3>
     <div class="grid-2">
-        <a href="{{ url_for('user.rooms') }}" class="stat-card" style="text-decoration:none; color:inherit;">
-            <div style="font-size:1.6rem; margin-bottom:6px;">🏡</div>
-            <div class="stat-label" style="font-weight:600; color:var(--text);">Browse Rooms</div>
-            <div class="stat-label">Explore our forest homestay rooms</div>
+        <a href="{{ url_for('user.rooms') }}" class="dash-action-card">
+            <div class="dash-action-icon">🏡</div>
+            <div class="dash-action-info">
+                <div class="title">Explore & Book Rooms</div>
+                <div class="desc">Discover our traditional cottages and serene riverfront huts.</div>
+            </div>
         </a>
-        <a href="{{ url_for('user.rooms') }}" class="stat-card" style="text-decoration:none; color:inherit;">
-            <div style="font-size:1.6rem; margin-bottom:6px;">📋</div>
-            <div class="stat-label" style="font-weight:600; color:var(--text);">My Bookings</div>
-            <div class="stat-label">View your booking history</div>
+
+        <a href="{{ url_for('user.my_bookings') }}" class="dash-action-card">
+            <div class="dash-action-icon">📋</div>
+            <div class="dash-action-info">
+                <div class="title">View My Bookings</div>
+                <div class="desc">Check confirmation statuses, dates, and submit feedback.</div>
+            </div>
         </a>
     </div>
 </div>

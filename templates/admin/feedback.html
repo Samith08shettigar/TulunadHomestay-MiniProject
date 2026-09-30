@@ -3,57 +3,90 @@
 
 {% block content %}
 <div class="container">
-    <div class="section-header mt-4">
-        <h2>Guest Feedback</h2>
+    <div class="section-header">
+        <div>
+            <h2>Guest Reviews & Feedback</h2>
+            <p style="color:var(--text-muted); font-size:0.95rem; margin-top:4px;">
+                Verified guest ratings and feedback for completed stays.
+            </p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline btn-sm">← Admin Dashboard</a>
     </div>
 
-    <!-- Average Rating Card -->
-    <div class="grid-3 mb-4">
-        <div class="stat-card">
-            <div class="stat-number text-accent">{{ avg_rating }}</div>
-            <div class="stat-label">Average Rating (out of 5)</div>
-            <div class="stars mt-1">
-                {% for i in range(avg_rating | int) %}★{% endfor %}{% for i in range(5 - avg_rating | int) %}☆{% endfor %}
+    <!-- Rating Stats Summary -->
+    <div class="grid-2 mb-4">
+        <div class="stat-card" style="border-left-color:var(--accent);">
+            <div style="display:flex; align-items:baseline; gap:8px;">
+                <div class="stat-number text-accent" style="font-size:2.6rem;">{{ avg_rating }}</div>
+                <div style="font-size:1.1rem; color:var(--text-muted);">/ 5.0</div>
+            </div>
+            <div class="stat-label">Average Homestay Rating</div>
+            <div class="stars mt-1" style="font-size:1.25rem;">
+                {% for i in range(avg_rating | int) %}★{% endfor %}{% for i in range(5 - (avg_rating | int)) %}☆{% endfor %}
             </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ total_reviews }}</div>
-            <div class="stat-label">Total Reviews</div>
+
+        <div class="stat-card" style="border-left-color:var(--forest);">
+            <div class="stat-number" style="color:var(--forest); font-size:2.6rem;">{{ total_reviews }}</div>
+            <div class="stat-label">Total Verified Reviews</div>
+            <div style="font-size:0.85rem; color:var(--text-muted); margin-top:6px;">From satisfied guests across Karnataka</div>
         </div>
     </div>
 
+    <!-- Feedback List / Table -->
     <div class="table-wrapper">
-        <table>
+        <table class="responsive-card-table">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Guest</th>
-                    <th>Room</th>
+                    <th># ID</th>
+                    <th>Guest Name</th>
+                    <th>Cottage</th>
                     <th>Stay Dates</th>
                     <th>Rating</th>
-                    <th>Comment</th>
-                    <th>Submitted</th>
+                    <th>Review Comment</th>
+                    <th>Date Submitted</th>
                 </tr>
             </thead>
             <tbody>
                 {% for fb in feedbacks %}
                 <tr>
-                    <td>{{ fb['id'] }}</td>
-                    <td>{{ fb['user_name'] }}</td>
-                    <td>{{ fb['room_name'] }}</td>
-                    <td>{{ fb['checkin_date'] }} → {{ fb['checkout_date'] }}</td>
-                    <td>
+                    <td data-label="Review ID">
+                        <span style="font-weight:700; color:var(--text-muted);">#{{ fb['id'] }}</span>
+                    </td>
+                    <td data-label="Guest">
+                        <strong style="color:var(--primary);">{{ fb['user_name'] }}</strong>
+                    </td>
+                    <td data-label="Cottage">
+                        <span>{{ fb['room_name'] }}</span>
+                    </td>
+                    <td data-label="Stay Dates">
+                        <div style="font-size:0.85rem;">
+                            📅 {{ fb['checkin_date'] }} → {{ fb['checkout_date'] }}
+                        </div>
+                    </td>
+                    <td data-label="Rating">
                         <span class="stars">
                             {% for i in range(fb['rating']) %}★{% endfor %}{% for i in range(5 - fb['rating']) %}☆{% endfor %}
                         </span>
-                        <span class="text-muted" style="margin-left:4px; font-size:0.8rem;">({{ fb['rating'] }}/5)</span>
+                        <span style="font-weight:700; font-size:0.85rem; margin-left:4px;">({{ fb['rating'] }}/5)</span>
                     </td>
-                    <td class="feedback-comment">{{ fb['comment'] or '—' }}</td>
-                    <td>{{ fb['created_at'][:10] if fb['created_at'] else '—' }}</td>
+                    <td data-label="Comment">
+                        <p style="font-size:0.9rem; line-height:1.5; color:var(--text); max-width:400px; margin:0;">
+                            "{{ fb['comment'] or 'No comment provided' }}"
+                        </p>
+                    </td>
+                    <td data-label="Submitted">
+                        <span style="font-size:0.85rem; color:var(--text-muted);">
+                            {{ fb['created_at'][:10] if fb['created_at'] else '—' }}
+                        </span>
+                    </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="7" class="text-center text-muted" style="padding:40px 20px;">No feedback submitted yet.</td>
+                    <td colspan="7" class="text-center text-muted" style="padding:48px 20px;">
+                        <p style="font-size:2.5rem; margin-bottom:8px;">⭐</p>
+                        <p>No feedback reviews submitted yet.</p>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

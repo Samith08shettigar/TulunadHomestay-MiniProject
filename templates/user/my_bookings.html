@@ -3,139 +3,163 @@
 
 {% block extra_css %}
 <style>
-    .bookings-table-wrap {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    .bookings-table {
+    /* ── Desktop Table & Mobile Card Transformation ─────────── */
+    .bookings-container {
         width: 100%;
-        min-width: 740px;
-        border-collapse: collapse;
-        background: var(--card-bg);
-        border-radius: var(--radius-lg);
-        overflow: hidden;
-        box-shadow: var(--shadow);
     }
-    .bookings-table thead { background: var(--bg-alt); }
-    .bookings-table th {
-        text-align: left;
-        padding: 14px 18px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: var(--text-light);
-        border-bottom: 1px solid var(--border);
-        white-space: nowrap;
-    }
-    .bookings-table td {
-        padding: 16px 18px;
-        font-size: 0.9rem;
-        border-bottom: 1px solid var(--border-light);
-        color: var(--text);
-        vertical-align: middle;
-    }
-    .bookings-table tr:last-child td { border-bottom: none; }
-    .bookings-table tr:hover td { background: var(--bg); }
 
-    /* Status pills */
-    .status-pill {
-        display: inline-flex;
+    .booking-room-meta {
+        display: flex;
         align-items: center;
-        padding: 4px 14px;
-        border-radius: 50px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 0.3px;
-        text-transform: uppercase;
+        gap: 12px;
     }
-    .status-pending  { background: #FDF6E3; color: #B8903D; }
-    .status-confirmed { background: #EDF7EF; color: #3A6347; }
-    .status-cancelled { background: #FDEDEB; color: #C0392B; }
+
+    .booking-room-thumb {
+        width: 52px;
+        height: 52px;
+        border-radius: var(--radius-sm);
+        object-fit: cover;
+        border: 1px solid var(--border);
+        flex-shrink: 0;
+    }
+
+    .booking-room-info .b-name {
+        font-weight: 800;
+        color: var(--primary);
+        font-size: 1rem;
+    }
+
+    .booking-room-info .b-price {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
 
     .btn-feedback {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        padding: 6px 14px;
-        border-radius: var(--radius-sm);
-        font-size: 0.8rem;
-        font-weight: 600;
-        background: var(--accent);
-        color: #fff;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: var(--radius-md);
+        font-size: 0.85rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+        color: #FFFFFF;
         border: none;
-        text-decoration: none;
-        cursor: pointer;
-        transition: all var(--transition);
-        white-space: nowrap;
+        box-shadow: var(--shadow-xs);
+        transition: all var(--ease-standard);
+        min-height: 40px;
     }
+
     .btn-feedback:hover {
-        background: var(--accent-dark);
-        color: #fff;
+        background: linear-gradient(135deg, var(--accent-dark) 0%, #8E6F1E 100%);
+        color: #FFFFFF;
         transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
     }
 
-    .feedback-done {
-        font-size: 0.8rem;
-        color: var(--success);
-        font-weight: 600;
+    .feedback-done-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.825rem;
+        color: var(--forest);
+        font-weight: 700;
+        background: var(--success-bg);
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
     }
 
-    /* Empty state */
-    .empty-state {
+    /* ── Empty State Card ────────────────────────────────────── */
+    .empty-bookings-card {
+        background: var(--bg-surface);
+        border-radius: var(--radius-xl);
+        padding: 60px 24px;
         text-align: center;
-        padding: 80px 20px;
+        border: 1px solid var(--border-light);
+        box-shadow: var(--shadow-sm);
+        max-width: 600px;
+        margin: 20px auto 0;
     }
+
     .empty-icon {
-        font-size: 4rem;
-        margin-bottom: 16px;
+        font-size: 3.5rem;
+        margin-bottom: 14px;
         display: block;
     }
+
     .empty-title {
         font-family: 'Nunito', sans-serif;
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: var(--text);
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--primary);
         margin-bottom: 8px;
     }
+
     .empty-desc {
-        font-size: 0.95rem;
         color: var(--text-muted);
+        font-size: 0.95rem;
         margin-bottom: 24px;
+        line-height: 1.6;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="section-header mt-4">
-        <h2>My Bookings</h2>
-        <a href="{{ url_for('user.rooms') }}" class="btn btn-primary btn-sm">+ New Booking</a>
+<div class="container bookings-container">
+    <div class="section-header">
+        <div>
+            <h2>My Reservations</h2>
+            <p style="color:var(--text-muted); font-size:0.95rem; margin-top:4px;">
+                Track your upcoming stays and feedback status.
+            </p>
+        </div>
+        <a href="{{ url_for('user.rooms') }}" class="btn btn-primary btn-sm">+ Book Another Stay</a>
     </div>
 
     {% if bookings %}
-        <div class="bookings-table-wrap">
-            <table class="bookings-table">
+        <div class="table-wrapper">
+            <table class="responsive-card-table">
                 <thead>
                     <tr>
-                        <th>Room Name</th>
-                        <th>Check-in</th>
-                        <th>Check-out</th>
-                        <th>Meal</th>
-                        <th>Fire Camp</th>
-                        <th>Status</th>
+                        <th>Cottage Details</th>
+                        <th>Stay Dates</th>
+                        <th>Meal Choice</th>
+                        <th>Campfire</th>
+                        <th>Booking Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for b in bookings %}
                     <tr>
-                        <td style="font-weight:600;">{{ b['room_name'] }}</td>
-                        <td>📅 {{ b['checkin_date'] }}</td>
-                        <td>📅 {{ b['checkout_date'] }}</td>
-                        <td>{{ '🥬' if b['meal_type'] == 'Veg' else '🍗' }} {{ b['meal_type'] }}</td>
-                        <td>{{ '🔥 Yes' if b['fire_camp'] == 'Yes' else 'No' }}</td>
-                        <td>
+                        <td data-label="Cottage">
+                            <div class="booking-room-meta">
+                                <img
+                                    src="{{ b['image_url'] or url_for('static', filename='images/hero-bg.jpg') }}"
+                                    alt="{{ b['room_name'] }}"
+                                    class="booking-room-thumb"
+                                    onerror="this.src='https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=800'"
+                                >
+                                <div class="booking-room-info">
+                                    <div class="b-name">{{ b['room_name'] }}</div>
+                                    <div class="b-price">₹{{ "%.0f"|format(b['price']) }} / night</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Dates">
+                            <div style="font-weight:600; font-size:0.9rem;">
+                                📅 {{ b['checkin_date'] }} → {{ b['checkout_date'] }}
+                            </div>
+                        </td>
+                        <td data-label="Meal Preference">
+                            <span>
+                                {{ '🥬 Vegetarian' if b['meal_type'] == 'Veg' else ('🍗 Non-Veg' if b['meal_type'] == 'Non-Veg' else '🍽️ Mixed') }}
+                            </span>
+                        </td>
+                        <td data-label="Campfire">
+                            <span>{{ '🔥 Yes' if b['fire_camp'] == 'Yes' else 'No' }}</span>
+                        </td>
+                        <td data-label="Status">
                             {% if b['status'] == 'Confirmed' %}
                                 <span class="status-pill status-confirmed">Confirmed</span>
                             {% elif b['status'] == 'Cancelled' %}
@@ -144,13 +168,15 @@
                                 <span class="status-pill status-pending">{{ b['status'] }}</span>
                             {% endif %}
                         </td>
-                        <td>
+                        <td data-label="Action">
                             {% if b['status'] == 'Confirmed' and not b['has_feedback'] %}
-                                <a href="{{ url_for('user.feedback', booking_id=b['id']) }}" class="btn-feedback">⭐ Leave Feedback</a>
+                                <a href="{{ url_for('user.feedback', booking_id=b['id']) }}" class="btn-feedback">
+                                    ⭐ Leave Feedback
+                                </a>
                             {% elif b['has_feedback'] %}
-                                <span class="feedback-done">✅ Feedback Given</span>
+                                <span class="feedback-done-badge">✅ Review Submitted</span>
                             {% else %}
-                                <span style="color:var(--text-muted); font-size:0.8rem;">—</span>
+                                <span class="text-muted" style="font-size:0.85rem;">Awaiting check-in</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -159,11 +185,11 @@
             </table>
         </div>
     {% else %}
-        <div class="empty-state">
+        <div class="empty-bookings-card">
             <span class="empty-icon">🏡</span>
-            <div class="empty-title">No bookings yet</div>
-            <div class="empty-desc">You haven't made any reservations. Start by exploring our cozy forest homestay rooms!</div>
-            <a href="{{ url_for('user.rooms') }}" class="btn btn-primary">Browse Rooms</a>
+            <h3 class="empty-title">No bookings yet</h3>
+            <p class="empty-desc">You haven't made any reservations yet. Discover our serene forest cottages and experience authentic Tulunad hospitality.</p>
+            <a href="{{ url_for('user.rooms') }}" class="btn btn-primary">Browse Available Rooms →</a>
         </div>
     {% endif %}
 </div>

@@ -3,57 +3,82 @@
 
 {% block content %}
 <div class="container">
-    <div class="section-header mt-4">
-        <h2>Manage Rooms</h2>
-        <a href="{{ url_for('admin.add_room') }}" class="btn btn-primary btn-sm">+ Add Room</a>
+    <div class="section-header">
+        <div>
+            <h2>Manage Homestay Cottages</h2>
+            <p style="color:var(--text-muted); font-size:0.95rem; margin-top:4px;">
+                Manage existing rooms, upload photos, set pricing, or add new listings.
+            </p>
+        </div>
+        <a href="{{ url_for('admin.add_room') }}" class="btn btn-primary btn-sm">+ Add New Cottage</a>
     </div>
 
     <div class="table-wrapper">
-        <table>
+        <table class="responsive-card-table">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Image</th>
-                    <th>Room Name</th>
-                    <th>Price (₹)</th>
-                    <th>Capacity</th>
-                    <th>Status</th>
+                    <th># ID</th>
+                    <th>Photo</th>
+                    <th>Cottage Name</th>
+                    <th>Price / Night</th>
+                    <th>Max Guests</th>
+                    <th>Availability</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for room in rooms %}
                 <tr>
-                    <td>{{ room['id'] }}</td>
-                    <td>
+                    <td data-label="ID">
+                        <span style="font-weight:700; color:var(--text-muted);">#{{ room['id'] }}</span>
+                    </td>
+                    <td data-label="Photo">
                         {% if room['image_url'] %}
-                            <img src="{{ room['image_url'] }}" alt="{{ room['room_name'] }}" class="table-thumb">
+                            <img
+                                src="{{ room['image_url'] }}"
+                                alt="{{ room['room_name'] }}"
+                                class="table-thumb"
+                                onerror="this.src='https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=800'"
+                            >
                         {% else %}
                             <span class="text-muted">—</span>
                         {% endif %}
                     </td>
-                    <td><strong>{{ room['room_name'] }}</strong></td>
-                    <td>₹{{ "%.0f"|format(room['price']) }}</td>
-                    <td>👥 {{ room['capacity'] }}</td>
-                    <td>
+                    <td data-label="Name">
+                        <strong style="color:var(--primary); font-size:1rem;">{{ room['room_name'] }}</strong>
+                    </td>
+                    <td data-label="Price">
+                        <span style="font-weight:700; color:var(--terracotta);">₹{{ "%.0f"|format(room['price']) }}</span>
+                    </td>
+                    <td data-label="Capacity">
+                        <span>👥 {{ room['capacity'] }} guests</span>
+                    </td>
+                    <td data-label="Status">
                         {% if room['availability'] %}
                             <span class="badge badge-success">Available</span>
                         {% else %}
                             <span class="badge badge-danger">Unavailable</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td data-label="Actions">
                         <div class="action-btns">
-                            <a href="{{ url_for('admin.edit_room', room_id=room['id']) }}" class="btn btn-outline btn-sm">Edit</a>
-                            <form method="POST" action="{{ url_for('admin.delete_room', room_id=room['id']) }}" onsubmit="return confirm('Delete this room?');" style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            <a href="{{ url_for('admin.edit_room', room_id=room['id']) }}" class="btn btn-outline btn-sm">
+                                ✏️ Edit
+                            </a>
+                            <form method="POST" action="{{ url_for('admin.delete_room', room_id=room['id']) }}" onsubmit="return confirm('Are you sure you want to delete this room? This will also remove associated bookings and gallery images.');" style="display:inline; flex:1;">
+                                <button type="submit" class="btn btn-danger btn-sm" style="width:100%;">
+                                    🗑️ Delete
+                                </button>
                             </form>
                         </div>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="7" class="text-center text-muted" style="padding:40px 20px;">No rooms added yet.</td>
+                    <td colspan="7" class="text-center text-muted" style="padding:48px 20px;">
+                        <p style="font-size:2.5rem; margin-bottom:8px;">🏡</p>
+                        <p>No rooms added yet. Click "+ Add New Cottage" to create your first listing.</p>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

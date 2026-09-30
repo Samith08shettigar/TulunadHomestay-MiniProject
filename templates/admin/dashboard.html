@@ -1,49 +1,92 @@
 {% extends 'base.html' %}
 {% block title %}Admin Dashboard — Tulunad Homestay{% endblock %}
 
+{% block extra_css %}
+<style>
+    .admin-welcome-banner {
+        background: linear-gradient(135deg, #3E2710 0%, #5B3A1A 100%);
+        border-radius: var(--radius-xl);
+        padding: 30px 28px;
+        color: #FFFFFF;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 28px;
+        border: 1px solid rgba(212, 160, 60, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .admin-welcome-banner h2 {
+        color: var(--accent-light);
+        margin-bottom: 4px;
+    }
+
+    .admin-welcome-banner p {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+        .admin-welcome-banner {
+            padding: 22px 18px;
+            border-radius: var(--radius-lg);
+        }
+        .admin-welcome-banner .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container">
-    <div class="section-header mt-4">
-        <h2>Admin Dashboard</h2>
+    <div class="admin-welcome-banner">
+        <div>
+            <h2>Admin Control Center ⚡</h2>
+            <p>Overview of cottages, reservations, pending approvals and reviews.</p>
+        </div>
+        <a href="{{ url_for('admin.add_room') }}" class="btn btn-accent btn-sm">+ Add New Cottage</a>
     </div>
-    <p class="text-muted mb-3">Welcome, {{ session.get('user_name') }}. Manage your homestay from here.</p>
 
     <!-- Stats Cards -->
     <div class="grid-4 mb-4">
         <div class="stat-card">
             <div class="stat-number">{{ total_rooms }}</div>
-            <div class="stat-label">Total Rooms</div>
+            <div class="stat-label">Total Cottages</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ total_bookings }}</div>
-            <div class="stat-label">Total Bookings</div>
+        <div class="stat-card" style="border-left-color: var(--primary-light);">
+            <div class="stat-number" style="color:var(--primary);">{{ total_bookings }}</div>
+            <div class="stat-label">Total Reservations</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" style="border-left-color: var(--accent);">
             <div class="stat-number text-accent">{{ pending_count }}</div>
-            <div class="stat-label">Pending</div>
+            <div class="stat-label">Pending Approval</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" style="border-left-color: var(--forest);">
             <div class="stat-number text-success">{{ confirmed_count }}</div>
-            <div class="stat-label">Confirmed</div>
+            <div class="stat-label">Confirmed Stays</div>
         </div>
     </div>
 
-    <!-- Quick Links -->
+    <!-- Management Quick Tiles -->
+    <h3 style="margin-bottom: 16px; color: var(--primary);">Homestay Operations</h3>
     <div class="grid-3">
         <a href="{{ url_for('admin.rooms') }}" class="stat-card admin-quick-link">
             <div class="quick-link-icon">🏡</div>
-            <div class="quick-link-title">Manage Rooms</div>
-            <div class="stat-label">Add, edit or remove rooms</div>
+            <div class="quick-link-title">Manage Cottages</div>
+            <div class="stat-label">Add, edit pricing, photos & availability</div>
         </a>
         <a href="{{ url_for('admin.bookings') }}" class="stat-card admin-quick-link">
             <div class="quick-link-icon">📋</div>
             <div class="quick-link-title">Manage Bookings</div>
-            <div class="stat-label">Confirm or cancel reservations</div>
+            <div class="stat-label">Review dates, confirm or cancel guest requests</div>
         </a>
         <a href="{{ url_for('admin.feedback') }}" class="stat-card admin-quick-link">
             <div class="quick-link-icon">⭐</div>
-            <div class="quick-link-title">View Feedback</div>
-            <div class="stat-label">Read guest reviews & ratings</div>
+            <div class="quick-link-title">Guest Reviews & Ratings</div>
+            <div class="stat-label">Monitor ratings, guest feedback & satisfaction</div>
         </a>
     </div>
 </div>

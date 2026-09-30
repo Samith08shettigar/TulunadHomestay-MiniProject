@@ -3,36 +3,54 @@
 
 {% block content %}
 <div class="container">
-    <div class="section-header mt-4">
-        <h2>Manage Bookings</h2>
+    <div class="section-header">
+        <div>
+            <h2>Manage Guest Bookings</h2>
+            <p style="color:var(--text-muted); font-size:0.95rem; margin-top:4px;">
+                Review incoming reservation requests and update statuses.
+            </p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline btn-sm">← Admin Dashboard</a>
     </div>
 
     <div class="table-wrapper">
-        <table>
+        <table class="responsive-card-table">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th># ID</th>
                     <th>Guest</th>
-                    <th>Room</th>
-                    <th>Check-in</th>
-                    <th>Check-out</th>
+                    <th>Cottage</th>
+                    <th>Stay Dates</th>
                     <th>Meal</th>
-                    <th>Fire Camp</th>
+                    <th>Campfire</th>
                     <th>Status</th>
-                    <th>Action</th>
+                    <th>Update Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for booking in bookings %}
                 <tr>
-                    <td>{{ booking['id'] }}</td>
-                    <td>{{ booking['user_name'] }}</td>
-                    <td>{{ booking['room_name'] }}</td>
-                    <td>{{ booking['checkin_date'] }}</td>
-                    <td>{{ booking['checkout_date'] }}</td>
-                    <td>{{ booking['meal_type'] or '—' }}</td>
-                    <td>{{ booking['fire_camp'] or '—' }}</td>
-                    <td>
+                    <td data-label="ID">
+                        <span style="font-weight:700; color:var(--text-muted);">#{{ booking['id'] }}</span>
+                    </td>
+                    <td data-label="Guest">
+                        <strong style="color:var(--primary);">{{ booking['user_name'] }}</strong>
+                    </td>
+                    <td data-label="Cottage">
+                        <span>{{ booking['room_name'] }}</span>
+                    </td>
+                    <td data-label="Dates">
+                        <div style="font-size:0.875rem; font-weight:600;">
+                            📅 {{ booking['checkin_date'] }} → {{ booking['checkout_date'] }}
+                        </div>
+                    </td>
+                    <td data-label="Meal Choice">
+                        <span>{{ booking['meal_type'] or '—' }}</span>
+                    </td>
+                    <td data-label="Campfire">
+                        <span>{{ '🔥 Yes' if booking['fire_camp'] == 'Yes' else 'No' }}</span>
+                    </td>
+                    <td data-label="Current Status">
                         {% if booking['status'] == 'Confirmed' %}
                             <span class="badge badge-success">Confirmed</span>
                         {% elif booking['status'] == 'Cancelled' %}
@@ -41,29 +59,34 @@
                             <span class="badge badge-warning">Pending</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td data-label="Action">
                         {% if booking['status'] == 'Pending' %}
                         <form method="POST" action="{{ url_for('admin.update_booking', booking_id=booking['id']) }}" class="inline-status-form">
-                            <select name="status" class="form-control form-control-sm">
-                                <option value="" disabled selected>Change…</option>
-                                <option value="Confirmed">Confirm</option>
-                                <option value="Cancelled">Cancel</option>
+                            <select name="status" class="form-control" required>
+                                <option value="" disabled selected>Select status…</option>
+                                <option value="Confirmed">✓ Confirm</option>
+                                <option value="Cancelled">✕ Cancel</option>
                             </select>
                             <button type="submit" class="btn btn-primary btn-sm">Update</button>
                         </form>
                         {% elif booking['status'] == 'Confirmed' %}
                         <form method="POST" action="{{ url_for('admin.update_booking', booking_id=booking['id']) }}" class="inline-status-form">
                             <input type="hidden" name="status" value="Cancelled">
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Cancel this booking?');">Cancel</button>
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Cancel this confirmed booking?');">
+                                Cancel Booking
+                            </button>
                         </form>
                         {% else %}
-                            <span class="text-muted">—</span>
+                            <span class="text-muted" style="font-size:0.85rem;">Booking Closed</span>
                         {% endif %}
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="9" class="text-center text-muted" style="padding:40px 20px;">No bookings yet.</td>
+                    <td colspan="8" class="text-center text-muted" style="padding:48px 20px;">
+                        <p style="font-size:2.5rem; margin-bottom:8px;">📋</p>
+                        <p>No bookings found in the system yet.</p>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -2,45 +2,183 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Tulunad Homestay — Authentic forest homestays in coastal Karnataka">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Tulunad Homestay — Authentic heritage homestays, cottages & cultural retreats in coastal Karnataka">
     <title>{% block title %}Tulunad Homestay{% endblock %}</title>
+    
+    <!-- Preconnect & Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Core Responsive CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
+    <!-- Top Navbar -->
+    <header class="navbar">
         <div class="navbar-inner">
-            <a class="navbar-brand" href="{{ url_for('home') }}">
+            <a class="navbar-brand" href="{{ url_for('home') }}" aria-label="Tulunad Homestay Home">
                 <img src="{{ url_for('static', filename='images/TulunadLogo.png') }}" alt="Tulunad Logo">
-                Tulunad Homestay
+                <div class="brand-text">
+                    <span class="brand-title">Tulunad Homestay</span>
+                    <span class="brand-subtitle">Coastal Heritage Retreat</span>
+                </div>
             </a>
 
-            <button class="navbar-toggle" onclick="document.getElementById('navLinks').classList.toggle('active')" aria-label="Toggle navigation">☰</button>
-
-            <ul class="navbar-links" id="navLinks">
+            <!-- Desktop Links -->
+            <ul class="navbar-links" id="desktopNavLinks">
                 {% if session.get('user_id') %}
                     {% if session.get('role') == 'admin' %}
-                        <li><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
-                        <li><a href="{{ url_for('admin.rooms') }}">Rooms</a></li>
-                        <li><a href="{{ url_for('admin.bookings') }}">Bookings</a></li>
-                        <li><a href="{{ url_for('admin.feedback') }}">Feedback</a></li>
+                        <li><a href="{{ url_for('admin.dashboard') }}">📊 Dashboard</a></li>
+                        <li><a href="{{ url_for('admin.rooms') }}">🏡 Rooms</a></li>
+                        <li><a href="{{ url_for('admin.bookings') }}">📋 Bookings</a></li>
+                        <li><a href="{{ url_for('admin.feedback') }}">⭐ Feedback</a></li>
                     {% else %}
-                        <li><a href="{{ url_for('user.dashboard') }}">Dashboard</a></li>
-                        <li><a href="{{ url_for('user.rooms') }}">Rooms</a></li>
-                        <li><a href="{{ url_for('user.my_bookings') }}">My Bookings</a></li>
+                        <li><a href="{{ url_for('home') }}">🏠 Home</a></li>
+                        <li><a href="{{ url_for('user.rooms') }}">🏡 Rooms</a></li>
+                        <li><a href="{{ url_for('user.my_bookings') }}">📋 My Bookings</a></li>
+                        <li><a href="{{ url_for('user.dashboard') }}">📊 Dashboard</a></li>
                     {% endif %}
                     <li><span class="navbar-user">👋 {{ session.get('user_name') }}</span></li>
-                    <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+                    <li><a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-outline" style="color:#FFF; border-color:rgba(255,255,255,0.4);">Logout</a></li>
                 {% else %}
+                    <li><a href="{{ url_for('home') }}">🏠 Home</a></li>
+                    <li><a href="{{ url_for('user.rooms') }}">🏡 Rooms</a></li>
                     <li><a href="{{ url_for('auth.login') }}">Login</a></li>
-                    <li><a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Register</a></li>
+                    <li><a href="{{ url_for('auth.register') }}" class="btn btn-accent btn-sm">Register</a></li>
                 {% endif %}
             </ul>
+
+            <!-- Mobile Drawer Toggle Button -->
+            <button class="navbar-toggle" id="drawerToggleBtn" aria-label="Open Navigation Menu">
+                ☰
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Slide-Out Drawer Navigation -->
+    <div class="mobile-drawer-overlay" id="mobileDrawerOverlay">
+        <aside class="mobile-drawer" id="mobileDrawer">
+            <div class="drawer-header">
+                <div class="brand-info">
+                    <img src="{{ url_for('static', filename='images/TulunadLogo.png') }}" alt="Tulunad Logo">
+                    <div>
+                        <div style="font-weight:800; font-size:1.05rem; color:var(--accent-light);">Tulunad Homestay</div>
+                        <div style="font-size:0.7rem; color:rgba(255,255,255,0.7);">Heritage & Culture</div>
+                    </div>
+                </div>
+                <button class="drawer-close" id="drawerCloseBtn" aria-label="Close menu">&times;</button>
+            </div>
+
+            {% if session.get('user_id') %}
+                <div class="drawer-user-card">
+                    <div class="user-name">👋 {{ session.get('user_name') }}</div>
+                    <div class="user-role">{{ 'Administrator' if session.get('role') == 'admin' else 'Valued Guest' }}</div>
+                </div>
+
+                <ul class="drawer-links">
+                    {% if session.get('role') == 'admin' %}
+                        <li><a href="{{ url_for('admin.dashboard') }}"><span class="icon">📊</span> Admin Dashboard</a></li>
+                        <li><a href="{{ url_for('admin.rooms') }}"><span class="icon">🏡</span> Manage Rooms</a></li>
+                        <li><a href="{{ url_for('admin.add_room') }}"><span class="icon">➕</span> Add New Room</a></li>
+                        <li><a href="{{ url_for('admin.bookings') }}"><span class="icon">📋</span> Manage Bookings</a></li>
+                        <li><a href="{{ url_for('admin.feedback') }}"><span class="icon">⭐</span> Guest Reviews</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('home') }}"><span class="icon">🏠</span> Home</a></li>
+                        <li><a href="{{ url_for('user.rooms') }}"><span class="icon">🏡</span> Explore Rooms</a></li>
+                        <li><a href="{{ url_for('user.my_bookings') }}"><span class="icon">📋</span> My Bookings</a></li>
+                        <li><a href="{{ url_for('user.dashboard') }}"><span class="icon">📊</span> My Dashboard</a></li>
+                    {% endif %}
+                    <li><hr style="border:none; border-top:1px solid rgba(255,255,255,0.15); margin:8px 0;"></li>
+                    <li><a href="{{ url_for('auth.logout') }}" style="color:var(--accent-light);"><span class="icon">🚪</span> Logout</a></li>
+                </ul>
+            {% else %}
+                <ul class="drawer-links" style="margin-top:10px;">
+                    <li><a href="{{ url_for('home') }}"><span class="icon">🏠</span> Home</a></li>
+                    <li><a href="{{ url_for('user.rooms') }}"><span class="icon">🏡</span> Browse Rooms</a></li>
+                    <li><a href="{{ url_for('auth.login') }}"><span class="icon">🔑</span> Login</a></li>
+                    <li><a href="{{ url_for('auth.register') }}"><span class="icon">✨</span> Register Account</a></li>
+                </ul>
+            {% endif %}
+
+            <div class="drawer-footer">
+                <div>📞 +91 9480762153</div>
+                <div>📍 Mangaluru &middot; Udupi, Karnataka</div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Mobile Fixed Bottom Navigation Bar (App Experience) -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile Navigation">
+        <div class="bottom-nav-inner">
+            {% if session.get('user_id') %}
+                {% if session.get('role') == 'admin' %}
+                    <a href="{{ url_for('admin.dashboard') }}" class="bottom-nav-item" id="bnav-admin-dash">
+                        <span class="nav-icon">📊</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{{ url_for('admin.rooms') }}" class="bottom-nav-item" id="bnav-admin-rooms">
+                        <span class="nav-icon">🏡</span>
+                        <span>Rooms</span>
+                    </a>
+                    <a href="{{ url_for('admin.bookings') }}" class="bottom-nav-item" id="bnav-admin-books">
+                        <span class="nav-icon">📋</span>
+                        <span>Bookings</span>
+                    </a>
+                    <a href="{{ url_for('admin.feedback') }}" class="bottom-nav-item" id="bnav-admin-feed">
+                        <span class="nav-icon">⭐</span>
+                        <span>Feedback</span>
+                    </a>
+                    <a href="javascript:void(0)" class="bottom-nav-item" id="bnav-menu-btn">
+                        <span class="nav-icon">☰</span>
+                        <span>Menu</span>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('home') }}" class="bottom-nav-item" id="bnav-home">
+                        <span class="nav-icon">🏠</span>
+                        <span>Home</span>
+                    </a>
+                    <a href="{{ url_for('user.rooms') }}" class="bottom-nav-item" id="bnav-rooms">
+                        <span class="nav-icon">🏡</span>
+                        <span>Rooms</span>
+                    </a>
+                    <a href="{{ url_for('user.my_bookings') }}" class="bottom-nav-item" id="bnav-bookings">
+                        <span class="nav-icon">📋</span>
+                        <span>Bookings</span>
+                    </a>
+                    <a href="{{ url_for('user.dashboard') }}" class="bottom-nav-item" id="bnav-dash">
+                        <span class="nav-icon">📊</span>
+                        <span>Profile</span>
+                    </a>
+                    <a href="javascript:void(0)" class="bottom-nav-item" id="bnav-menu-btn">
+                        <span class="nav-icon">☰</span>
+                        <span>Menu</span>
+                    </a>
+                {% endif %}
+            {% else %}
+                <a href="{{ url_for('home') }}" class="bottom-nav-item" id="bnav-home">
+                    <span class="nav-icon">🏠</span>
+                    <span>Home</span>
+                </a>
+                <a href="{{ url_for('user.rooms') }}" class="bottom-nav-item" id="bnav-rooms">
+                    <span class="nav-icon">🏡</span>
+                    <span>Rooms</span>
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="bottom-nav-item" id="bnav-login">
+                    <span class="nav-icon">🔑</span>
+                    <span>Login</span>
+                </a>
+                <a href="{{ url_for('auth.register') }}" class="bottom-nav-item" id="bnav-reg">
+                    <span class="nav-icon">✨</span>
+                    <span>Register</span>
+                </a>
+                <a href="javascript:void(0)" class="bottom-nav-item" id="bnav-menu-btn">
+                    <span class="nav-icon">☰</span>
+                    <span>Menu</span>
+                </a>
+            {% endif %}
         </div>
     </nav>
 
@@ -49,9 +187,9 @@
         {% if messages %}
             <div class="flash-container">
                 {% for category, message in messages %}
-                    <div class="flash-message flash-{{ category }}">
+                    <div class="flash-message flash-{{ category }}" role="alert">
                         <span>{{ message }}</span>
-                        <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+                        <button class="flash-close" onclick="this.parentElement.remove()" aria-label="Close alert">&times;</button>
                     </div>
                 {% endfor %}
             </div>
@@ -63,14 +201,17 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
+    <!-- Responsive Footer -->
     <footer class="footer">
-        <p>&copy; 2025 Tulunad Homestay · Mangaluru &middot; Udupi, Karnataka</p>
-        <p style="color: white; font-size: 10px;">
-  Contact us: +91 9480762153 | info@tulunadhomestay.com
-</p>
+        <div class="footer-inner">
+            <p>&copy; 2025 Tulunad Homestay · Coastal Karnataka Cultural Living</p>
+            <p class="footer-contact">
+                📞 +91 9480762153 &nbsp;|&nbsp; ✉️ info@tulunadhomestay.com &nbsp;|&nbsp; 📍 Mangaluru · Udupi, Karnataka
+            </p>
+        </div>
     </footer>
 
+    <!-- Main JavaScript for Drawer & Mobile UI -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>

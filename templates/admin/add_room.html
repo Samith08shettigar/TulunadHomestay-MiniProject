@@ -1,169 +1,210 @@
 {% extends 'base.html' %}
 {% block title %}Add Room — Tulunad Homestay{% endblock %}
 
-{% block content %}
-<div class="container">
-    <div class="section-header mt-4">
-        <h2>Add New Room</h2>
-        <a href="{{ url_for('admin.rooms') }}" class="btn btn-outline btn-sm">← Back to Rooms</a>
-    </div>
-
-    <div class="form-card">
-        <form method="POST" action="{{ url_for('admin.add_room') }}" enctype="multipart/form-data">
-            <div class="form-group">
-                <label class="form-label" for="room_name">Room Name</label>
-                <input type="text" name="room_name" id="room_name" class="form-control" placeholder="e.g. Forest View Cottage" required>
-            </div>
-
-            <div class="grid-2">
-                <div class="form-group">
-                    <label class="form-label" for="price">Price per Night (₹)</label>
-                    <input type="number" name="price" id="price" class="form-control" placeholder="2500" min="0" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="capacity">Capacity (Guests)</label>
-                    <input type="number" name="capacity" id="capacity" class="form-control" placeholder="4" min="1" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="description">Description</label>
-                <textarea name="description" id="description" class="form-control" placeholder="Describe the room, amenities, views…"></textarea>
-            </div>
-
-            <!-- Cover Image -->
-            <div class="form-group">
-                <label class="form-label">Cover Image (shown on listing card)</label>
-                <div class="upload-option-group">
-                    <div class="upload-option">
-                        <label class="form-label form-label-sm">Upload from computer</label>
-                        <input type="file" name="cover_image" accept="image/*" class="form-control">
-                    </div>
-                    <div class="upload-divider">OR</div>
-                    <div class="upload-option">
-                        <label class="form-label form-label-sm">Paste image URL</label>
-                        <input type="url" name="image_url" class="form-control" placeholder="https://images.unsplash.com/…">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gallery Images -->
-            <div class="form-group">
-                <label class="form-label">Gallery Images</label>
-
-                <div class="gallery-upload-section">
-                    <label class="form-label form-label-sm">Upload from computer</label>
-                    <div id="file-uploads-container">
-                        <div class="file-upload-row">
-                            <input type="file" name="gallery_files" accept="image/*" multiple class="form-control" style="flex:1">
-                            <button type="button" class="btn btn-outline btn-sm file-upload-remove" title="Remove" style="margin-left:8px;color:var(--danger,#e74c3c);">✕</button>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-outline btn-sm" id="add-file-btn" style="margin-top:8px;">+ Add another file upload</button>
-                </div>
-
-                <div class="gallery-url-section" style="margin-top:12px;">
-                    <label class="form-label form-label-sm">Or add by URL</label>
-                    <div id="extra-images-container">
-                        <div class="extra-image-row">
-                            <input type="url" name="extra_images" class="form-control" placeholder="https://images.unsplash.com/…" style="flex:1">
-                            <button type="button" class="btn btn-outline btn-sm extra-img-remove" title="Remove" style="margin-left:8px;color:var(--danger,#e74c3c);">✕</button>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-outline btn-sm" id="add-image-btn" style="margin-top:8px;">+ Add another image URL</button>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label form-check-label">
-                    <input type="checkbox" name="availability" value="1" checked class="form-check-input">
-                    Available for booking
-                </label>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-block">Add Room</button>
-        </form>
-    </div>
-</div>
-{% endblock %}
-
 {% block extra_css %}
 <style>
+    .upload-box {
+        background: var(--bg-alt);
+        border: 1.5px dashed var(--border);
+        border-radius: var(--radius-md);
+        padding: 18px;
+        margin-bottom: 14px;
+    }
+
     .upload-option-group {
         display: flex;
         align-items: center;
         gap: 16px;
         flex-wrap: wrap;
     }
+
     .upload-option {
         flex: 1;
         min-width: 200px;
     }
+
     .upload-divider {
         font-size: 0.8rem;
-        font-weight: 600;
-        color: var(--text-muted, #999);
+        font-weight: 700;
+        color: var(--text-muted);
         text-transform: uppercase;
         letter-spacing: 1px;
     }
+
     .form-label-sm {
         font-size: 0.8rem;
-        color: var(--text-muted, #888);
+        color: var(--text-muted);
         margin-bottom: 4px;
     }
-    .extra-image-row {
+
+    .dynamic-row {
         display: flex;
         align-items: center;
-        margin-bottom: 8px;
+        gap: 8px;
+        margin-bottom: 10px;
     }
-    .extra-image-row .form-control {
+
+    .dynamic-row .form-control {
         flex: 1;
     }
-    .file-upload-row {
+
+    .remove-btn {
+        min-width: 38px;
+        min-height: 38px;
+        padding: 0;
         display: flex;
         align-items: center;
-        margin-bottom: 8px;
+        justify-content: center;
+        color: var(--danger);
+        border-color: var(--danger);
+        border-radius: var(--radius-sm);
+    }
+
+    @media (max-width: 640px) {
+        .upload-option-group {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+        .upload-divider {
+            text-align: center;
+        }
     }
 </style>
 {% endblock %}
 
+{% block content %}
+<div class="container">
+    <div class="section-header">
+        <div>
+            <h2>Add New Homestay Cottage</h2>
+            <p style="color:var(--text-muted); font-size:0.95rem; margin-top:4px;">
+                Enter cottage specifications, pricing, and gallery images.
+            </p>
+        </div>
+        <a href="{{ url_for('admin.rooms') }}" class="btn btn-outline btn-sm">← Back to Rooms</a>
+    </div>
+
+    <div class="form-card">
+        <form method="POST" action="{{ url_for('admin.add_room') }}" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="form-label" for="room_name">Cottage / Room Name</label>
+                <input type="text" name="room_name" id="room_name" class="form-control" placeholder="e.g. Western Ghats Riverside Cottage" required>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label class="form-label" for="price">Price per Night (₹)</label>
+                    <input type="number" name="price" id="price" class="form-control" placeholder="3000" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="capacity">Maximum Guests</label>
+                    <input type="number" name="capacity" id="capacity" class="form-control" placeholder="4" min="1" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="description">Cottage Description & Highlights</label>
+                <textarea name="description" id="description" class="form-control" placeholder="Describe the ambiance, balcony views, bed type, surroundings..."></textarea>
+            </div>
+
+            <!-- Primary Cover Image -->
+            <div class="form-group">
+                <label class="form-label">Main Cover Image (Card Display)</label>
+                <div class="upload-box">
+                    <div class="upload-option-group">
+                        <div class="upload-option">
+                            <label class="form-label form-label-sm">Upload file from device</label>
+                            <input type="file" name="cover_image" accept="image/*" class="form-control">
+                        </div>
+                        <div class="upload-divider">OR</div>
+                        <div class="upload-option">
+                            <label class="form-label form-label-sm">Paste image web URL</label>
+                            <input type="url" name="image_url" class="form-control" placeholder="https://images.unsplash.com/…">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Gallery Images -->
+            <div class="form-group">
+                <label class="form-label">Additional Gallery Images</label>
+
+                <div class="upload-box">
+                    <label class="form-label form-label-sm">Upload gallery files</label>
+                    <div id="file-uploads-container">
+                        <div class="dynamic-row">
+                            <input type="file" name="gallery_files" accept="image/*" multiple class="form-control">
+                            <button type="button" class="btn btn-outline btn-sm remove-btn file-upload-remove" title="Remove">✕</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline btn-sm" id="add-file-btn" style="margin-top:6px;">+ Add another file input</button>
+                </div>
+
+                <div class="upload-box">
+                    <label class="form-label form-label-sm">Or add by Image URLs</label>
+                    <div id="extra-images-container">
+                        <div class="dynamic-row">
+                            <input type="url" name="extra_images" class="form-control" placeholder="https://images.unsplash.com/…">
+                            <button type="button" class="btn btn-outline btn-sm remove-btn extra-img-remove" title="Remove">✕</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline btn-sm" id="add-image-btn" style="margin-top:6px;">+ Add another URL input</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-check-label">
+                    <input type="checkbox" name="availability" value="1" checked class="form-check-input">
+                    Mark room as Available for instant booking
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="min-height:50px; font-size:1rem;">
+                + Save & Publish Cottage Listing
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
 {% block extra_js %}
 <script>
-    /* File upload rows: add / remove */
+    // Add/Remove file rows
     const fileContainer = document.getElementById('file-uploads-container');
     const addFileBtn = document.getElementById('add-file-btn');
 
     addFileBtn.addEventListener('click', function () {
         const row = document.createElement('div');
-        row.className = 'file-upload-row';
+        row.className = 'dynamic-row';
         row.innerHTML =
-            '<input type="file" name="gallery_files" accept="image/*" multiple class="form-control" style="flex:1">' +
-            '<button type="button" class="btn btn-outline btn-sm file-upload-remove" title="Remove" style="margin-left:8px;color:var(--danger,#e74c3c);">✕</button>';
+            '<input type="file" name="gallery_files" accept="image/*" multiple class="form-control">' +
+            '<button type="button" class="btn btn-outline btn-sm remove-btn file-upload-remove" title="Remove">✕</button>';
         fileContainer.appendChild(row);
     });
 
     fileContainer.addEventListener('click', function (e) {
         if (e.target.classList.contains('file-upload-remove')) {
-            e.target.closest('.file-upload-row').remove();
+            e.target.closest('.dynamic-row').remove();
         }
     });
 
-    /* URL inputs: add / remove */
-    const container = document.getElementById('extra-images-container');
-    const addBtn = document.getElementById('add-image-btn');
+    // Add/Remove URL rows
+    const urlContainer = document.getElementById('extra-images-container');
+    const addUrlBtn = document.getElementById('add-image-btn');
 
-    addBtn.addEventListener('click', function () {
+    addUrlBtn.addEventListener('click', function () {
         const row = document.createElement('div');
-        row.className = 'extra-image-row';
+        row.className = 'dynamic-row';
         row.innerHTML =
-            '<input type="url" name="extra_images" class="form-control" placeholder="https://images.unsplash.com/…" style="flex:1">' +
-            '<button type="button" class="btn btn-outline btn-sm extra-img-remove" title="Remove" style="margin-left:8px;color:var(--danger,#e74c3c);">✕</button>';
-        container.appendChild(row);
+            '<input type="url" name="extra_images" class="form-control" placeholder="https://images.unsplash.com/…">' +
+            '<button type="button" class="btn btn-outline btn-sm remove-btn extra-img-remove" title="Remove">✕</button>';
+        urlContainer.appendChild(row);
     });
 
-    container.addEventListener('click', function (e) {
+    urlContainer.addEventListener('click', function (e) {
         if (e.target.classList.contains('extra-img-remove')) {
-            e.target.closest('.extra-image-row').remove();
+            e.target.closest('.dynamic-row').remove();
         }
     });
 </script>

@@ -1,8 +1,12 @@
 {% extends 'base.html' %}
-{% block title %}Rooms — Tulunad Homestay{% endblock %}
+{% block title %}Explore Rooms — Tulunad Homestay{% endblock %}
 
 {% block extra_css %}
 <style>
+    .rooms-page-header {
+        margin-bottom: 28px;
+    }
+
     .rooms-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -10,132 +14,237 @@
     }
 
     .room-card {
-        background: var(--card-bg);
+        background: var(--bg-surface);
         border-radius: var(--radius-lg);
-        box-shadow: var(--shadow);
+        box-shadow: var(--shadow-sm);
         overflow: hidden;
-        transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), box-shadow 0.25s cubic-bezier(0.4,0,0.2,1);
+        border: 1px solid var(--border-light);
+        transition: transform var(--ease-standard), box-shadow var(--ease-standard);
+        display: flex;
+        flex-direction: column;
     }
+
     .room-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 32px rgba(0,0,0,0.14);
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--accent-light);
+    }
+
+    .room-card-img-wrap {
+        position: relative;
+        width: 100%;
+        height: 220px;
+        background: #111;
+        overflow: hidden;
     }
 
     .room-card-img {
         width: 100%;
-        height: 200px;
+        height: 100%;
         object-fit: cover;
-        display: block;
+        transition: transform 0.4s ease;
+    }
+
+    .room-card:hover .room-card-img {
+        transform: scale(1.05);
+    }
+
+    .room-card-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(46, 107, 62, 0.9);
+        backdrop-filter: blur(4px);
+        color: #FFFFFF;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+        letter-spacing: 0.3px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
     .room-card-body {
-        padding: 20px;
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
     }
 
     .room-card-name {
         font-family: 'Nunito', sans-serif;
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: var(--text);
-        margin-bottom: 6px;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 8px;
+        line-height: 1.25;
     }
 
     .room-card-meta {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border-light);
     }
 
     .room-card-price {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: var(--primary);
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--terracotta);
     }
+
     .room-card-price span {
-        font-size: 0.8rem;
-        font-weight: 400;
+        font-size: 0.825rem;
+        font-weight: 500;
         color: var(--text-muted);
     }
 
     .room-card-capacity {
         font-size: 0.875rem;
-        color: var(--text-light);
-        display: flex;
+        color: var(--text-muted);
+        background: var(--bg-alt);
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+        font-weight: 600;
+        display: inline-flex;
         align-items: center;
         gap: 4px;
     }
 
     .room-card-desc {
-        font-size: 0.875rem;
-        color: var(--text-light);
-        line-height: 1.5;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.55;
+        margin-bottom: 20px;
         display: -webkit-box;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        margin-bottom: 16px;
+        flex: 1;
+    }
+
+    .room-card-amenities {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 18px;
+    }
+
+    .amenity-chip {
+        font-size: 0.75rem;
+        background: var(--bg-alt);
+        color: var(--primary);
+        padding: 3px 8px;
+        border-radius: var(--radius-xs);
+        font-weight: 600;
     }
 
     .room-card-action {
-        display: flex;
+        margin-top: auto;
     }
 
-    /* Tablet */
-    @media (max-width: 900px) {
-        .rooms-grid { grid-template-columns: repeat(2, 1fr); }
+    /* ── Responsive Tablet & Mobile ──────────────────────────── */
+    @media (max-width: 960px) {
+        .rooms-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
     }
 
-    /* Mobile */
     @media (max-width: 640px) {
-        .rooms-grid { grid-template-columns: 1fr; }
+        .rooms-grid {
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
+        .room-card-img-wrap {
+            height: 200px;
+        }
+
+        .room-card-body {
+            padding: 16px;
+        }
+
+        .room-card-name {
+            font-size: 1.15rem;
+        }
+
+        .room-card-price {
+            font-size: 1.25rem;
+        }
+
+        .room-card-action .btn {
+            width: 100%;
+            min-height: 48px;
+            font-size: 1rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="section-header mt-4">
-        <h2>Available Rooms</h2>
-        <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline btn-sm">← Dashboard</a>
+    <div class="section-header rooms-page-header">
+        <div>
+            <h2>Available Cottages & Lodges</h2>
+            <p style="color:var(--text-muted); font-size:0.95rem; margin-top:4px;">
+                Choose your ideal stay surrounded by coastal Karnataka's scenic wilderness.
+            </p>
+        </div>
+        <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline btn-sm">← My Dashboard</a>
     </div>
 
     {% if rooms %}
         <div class="rooms-grid">
             {% for room in rooms %}
-            <div class="room-card">
-                <img
-                    src="{{ room['image_url'] }}"
-                    alt="{{ room['room_name'] }}"
-                    class="room-card-img"
-                    loading="lazy"
-                    onerror="this.src='https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800'"
-                >
+            <article class="room-card">
+                <div class="room-card-img-wrap">
+                    <img
+                        src="{{ room['image_url'] }}"
+                        alt="{{ room['room_name'] }}"
+                        class="room-card-img"
+                        loading="lazy"
+                        onerror="this.src='https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=800'"
+                    >
+                    <span class="room-card-badge">Available</span>
+                </div>
+                
                 <div class="room-card-body">
-                    <div class="room-card-name">{{ room['room_name'] }}</div>
+                    <h3 class="room-card-name">{{ room['room_name'] }}</h3>
 
                     <div class="room-card-meta">
                         <div class="room-card-price">
                             ₹{{ "%.0f"|format(room['price']) }} <span>/ night</span>
                         </div>
                         <div class="room-card-capacity">
-                            👥 {{ room['capacity'] }} guests
+                            👥 {{ room['capacity'] }} guests max
                         </div>
                     </div>
 
-                    <div class="room-card-desc">{{ room['description'] }}</div>
+                    <div class="room-card-amenities">
+                        <span class="amenity-chip">🌿 Nature View</span>
+                        <span class="amenity-chip">🍽️ Meals Option</span>
+                        <span class="amenity-chip">🔥 Campfire Available</span>
+                    </div>
+
+                    <p class="room-card-desc">{{ room['description'] }}</p>
 
                     <div class="room-card-action">
-                        <a href="{{ url_for('user.book_room', room_id=room['id']) }}" class="btn btn-primary btn-sm btn-block">Book Now</a>
+                        <a href="{{ url_for('user.book_room', room_id=room['id']) }}" class="btn btn-primary btn-block">
+                            Book Now →
+                        </a>
                     </div>
                 </div>
-            </div>
+            </article>
             {% endfor %}
         </div>
     {% else %}
-        <div class="text-center mt-4" style="padding:60px 0;">
-            <p style="font-size:2rem; margin-bottom:8px;">🏡</p>
-            <p class="text-muted">No rooms are currently available. Please check back later.</p>
+        <div class="text-center" style="padding:60px 20px; background:var(--bg-surface); border-radius:var(--radius-lg); border:1px solid var(--border);">
+            <p style="font-size:3rem; margin-bottom:12px;">🏡</p>
+            <h3>No rooms currently available</h3>
+            <p class="text-muted" style="margin-top:6px;">Please check back soon as our accommodations update regularly.</p>
         </div>
     {% endif %}
 </div>

@@ -4,93 +4,135 @@
 {% block extra_css %}
 <style>
     .feedback-wrapper {
-        max-width: 600px;
+        max-width: 640px;
         margin: 0 auto;
     }
 
     .stay-summary {
         display: flex;
         align-items: center;
-        gap: 20px;
-        background: var(--card-bg);
+        gap: 18px;
+        background: var(--bg-surface);
         border-radius: var(--radius-lg);
-        box-shadow: var(--shadow);
+        box-shadow: var(--shadow-sm);
         padding: 20px 24px;
-        margin-bottom: 28px;
-    }
-    .stay-summary img {
-        width: 100px;
-        height: 70px;
-        object-fit: cover;
-        border-radius: var(--radius-sm);
-    }
-    .stay-info h3 {
-        margin-bottom: 4px;
-    }
-    .stay-dates {
-        font-size: 0.875rem;
-        color: var(--text-light);
+        margin-bottom: 24px;
+        border: 1px solid var(--border-light);
     }
 
-    /* Star rating — pure CSS with radio inputs */
-    .star-rating {
-        display: flex;
-        flex-direction: row-reverse;
-        justify-content: flex-end;
-        gap: 4px;
-        margin: 8px 0 4px;
+    .stay-summary img {
+        width: 80px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        flex-shrink: 0;
     }
+
+    .stay-info h3 {
+        font-size: 1.15rem;
+        margin-bottom: 4px;
+        color: var(--primary);
+    }
+
+    .stay-dates {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    /* ── Touch-Friendly Star Rating ─────────────────────────── */
+    .star-rating-box {
+        background: var(--bg-alt);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 16px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .star-rating {
+        display: inline-flex;
+        flex-direction: row-reverse;
+        justify-content: center;
+        gap: 8px;
+    }
+
     .star-rating input {
         display: none;
     }
+
     .star-rating label {
-        font-size: 2rem;
-        color: var(--border);
+        font-size: 2.4rem;
+        color: #D1C5B7;
         cursor: pointer;
-        transition: color 0.15s ease, transform 0.15s ease;
+        transition: all 0.2s ease;
         line-height: 1;
+        padding: 4px;
+        touch-action: manipulation;
     }
+
     .star-rating label:hover,
     .star-rating label:hover ~ label,
     .star-rating input:checked ~ label {
         color: var(--accent);
-    }
-    .star-rating label:hover {
-        transform: scale(1.2);
+        transform: scale(1.1);
     }
 
     .rating-hint {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         color: var(--text-muted);
-        margin-bottom: 20px;
+        margin-top: 8px;
+        font-weight: 600;
     }
 
     .char-count {
         font-size: 0.8rem;
         color: var(--text-muted);
         text-align: right;
-        margin-top: 4px;
+        margin-top: 6px;
+    }
+
+    @media (max-width: 640px) {
+        .stay-summary {
+            padding: 16px;
+            gap: 14px;
+        }
+        .stay-summary img {
+            width: 64px;
+            height: 50px;
+        }
+        .star-rating label {
+            font-size: 2.1rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="section-header mt-4">
-        <h2>Leave Feedback</h2>
-        <a href="{{ url_for('user.my_bookings') }}" class="btn btn-outline btn-sm">← Back to Bookings</a>
+    <div class="section-header">
+        <div>
+            <h2>Share Your Experience</h2>
+            <p style="color:var(--text-muted); font-size:0.95rem; margin-top:4px;">
+                Your feedback helps us continuously improve our homestay hospitality.
+            </p>
+        </div>
+        <a href="{{ url_for('user.my_bookings') }}" class="btn btn-outline btn-sm">← Back to My Bookings</a>
     </div>
 
     <div class="feedback-wrapper">
-        <!-- Stay Summary -->
+        <!-- Stay Details Summary -->
         <div class="stay-summary">
-            {% if booking['image_url'] %}
-                <img src="{{ booking['image_url'] }}" alt="{{ booking['room_name'] }}">
-            {% endif %}
+            <img
+                src="{{ booking['image_url'] or url_for('static', filename='images/hero-bg.jpg') }}"
+                alt="{{ booking['room_name'] }}"
+                onerror="this.src='https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=800'"
+            >
             <div class="stay-info">
                 <h3>{{ booking['room_name'] }}</h3>
                 <div class="stay-dates">
-                    📅 {{ booking['checkin_date'] }} → {{ booking['checkout_date'] }}
+                    📅 Stay: {{ booking['checkin_date'] }} → {{ booking['checkout_date'] }}
                 </div>
             </div>
         </div>
@@ -98,11 +140,11 @@
         <!-- Feedback Form -->
         <div class="form-card">
             <form method="POST" action="{{ url_for('user.feedback', booking_id=booking['id']) }}" id="feedbackForm">
-                <div class="form-group">
-                    <label class="form-label">Your Rating</label>
+                <div class="star-rating-box">
+                    <label class="form-label" style="margin-bottom:10px;">Overall Rating</label>
                     <div class="star-rating">
                         <input type="radio" id="star5" name="rating" value="5">
-                        <label for="star5" title="5 — Excellent">★</label>
+                        <label for="star5" title="5 — Exceptional">★</label>
                         <input type="radio" id="star4" name="rating" value="4">
                         <label for="star4" title="4 — Very Good">★</label>
                         <input type="radio" id="star3" name="rating" value="3">
@@ -112,16 +154,16 @@
                         <input type="radio" id="star1" name="rating" value="1">
                         <label for="star1" title="1 — Poor">★</label>
                     </div>
-                    <div class="rating-hint">Click a star to rate your stay</div>
+                    <div class="rating-hint" id="ratingText">Tap a star to rate your stay</div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="comment">Your Comment</label>
+                    <label class="form-label" for="comment">Your Review & Comments</label>
                     <textarea
                         name="comment"
                         id="comment"
                         class="form-control"
-                        placeholder="Tell us about your experience… (min 10 characters)"
+                        placeholder="Tell us what you loved about the food, views, ambiance or cottage… (minimum 10 characters)"
                         minlength="10"
                         required
                         oninput="document.getElementById('charCount').textContent = this.value.length + ' characters'"
@@ -129,7 +171,9 @@
                     <div class="char-count" id="charCount">0 characters</div>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-block" onclick="return validateFeedback()">Submit Feedback</button>
+                <button type="submit" class="btn btn-primary btn-block" onclick="return validateFeedback()">
+                    Submit Guest Review →
+                </button>
             </form>
         </div>
     </div>
@@ -138,18 +182,34 @@
 
 {% block extra_js %}
 <script>
-function validateFeedback() {
-    const rating = document.querySelector('input[name="rating"]:checked');
-    if (!rating) {
-        alert('Please select a star rating.');
-        return false;
+    const ratingInputs = document.querySelectorAll('input[name="rating"]');
+    const ratingText = document.getElementById('ratingText');
+    const labels = {
+        '5': '⭐ 5 Stars — Exceptional!',
+        '4': '⭐ 4 Stars — Very Good',
+        '3': '⭐ 3 Stars — Good',
+        '2': '⭐ 2 Stars — Fair',
+        '1': '⭐ 1 Star — Poor'
+    };
+
+    ratingInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            ratingText.textContent = labels[this.value] || '';
+        });
+    });
+
+    function validateFeedback() {
+        const rating = document.querySelector('input[name="rating"]:checked');
+        if (!rating) {
+            alert('Please select a star rating.');
+            return false;
+        }
+        const comment = document.getElementById('comment').value.trim();
+        if (comment.length < 10) {
+            alert('Please write at least 10 characters in your comment.');
+            return false;
+        }
+        return true;
     }
-    const comment = document.getElementById('comment').value.trim();
-    if (comment.length < 10) {
-        alert('Comment must be at least 10 characters.');
-        return false;
-    }
-    return true;
-}
 </script>
 {% endblock %}

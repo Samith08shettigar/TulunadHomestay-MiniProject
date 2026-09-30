@@ -1,57 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Login — Tulunad Homestay</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        *,
-        *::before,
-        *::after {
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #5B3A1A;
+            --primary-dark: #38210D;
+            --accent: #D4A03C;
+            --accent-dark: #B8882A;
+            --accent-light: #EED188;
+            --text: #24150B;
+            --text-muted: #745F51;
+            --border: #E8DDD0;
+            --radius-md: 14px;
+            --radius-xl: 22px;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            position: relative;
-            background-image: url("{{ url_for('static', filename='images/moolatulunad.jpg') }}");
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, rgba(36, 21, 11, 0.75) 0%, rgba(56, 33, 13, 0.82) 100%),
+                        url("{{ url_for('static', filename='images/moolatulunad.jpg') }}") center/cover no-repeat;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 24px;
-            z-index: 1;
-        }
-
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            /* adjust opacity here (0.0 - 1.0) */
-            z-index: -1;
+            padding: 24px 16px;
+            color: var(--text);
         }
 
         .auth-container {
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
+            margin: 0 auto;
         }
 
-        /* Flash messages */
+        /* ── Flash Messages ───────────────────────────────────── */
         .flash-list {
             list-style: none;
             margin-bottom: 16px;
@@ -59,101 +56,78 @@
 
         .flash-item {
             padding: 12px 16px;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             font-size: 0.9rem;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            animation: slideDown 0.3s ease-out;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease-out;
         }
 
-        .flash-success {
-            background: #E8F5E9;
-            color: #2E6B3E;
-            border-left: 4px solid #2E6B3E;
+        .flash-success { background: #EAF6ED; color: #2E6B3E; border-left: 4px solid #2E6B3E; }
+        .flash-danger  { background: #FDF0ED; color: #C1502E; border-left: 4px solid #C1502E; }
+        .flash-info    { background: #E8F4FA; color: #226F9E; border-left: 4px solid #226F9E; }
+        .flash-warning { background: #FEF9E7; color: #B8860B; border-left: 4px solid #D4A03C; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        .flash-danger {
-            background: #FDEDEB;
-            color: #C1502E;
-            border-left: 4px solid #C1502E;
-        }
-
-        .flash-info {
-            background: #E3F2F8;
-            color: #2E6D8E;
-            border-left: 4px solid #2E6D8E;
-        }
-
-        .flash-warning {
-            background: #FDF6E3;
-            color: #B8882A;
-            border-left: 4px solid #D4A03C;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Card */
+        /* ── Auth Card ────────────────────────────────────────── */
         .auth-card {
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 4px 24px rgba(44, 26, 14, 0.10), 0 1px 4px rgba(44, 26, 14, 0.05);
-            padding: 44px 36px 36px;
-            border-top: 4px solid #D4A03C;
+            background: #FFFFFF;
+            border-radius: var(--radius-xl);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+            padding: 40px 32px;
+            border-top: 5px solid var(--accent);
+            width: 100%;
         }
 
         .auth-logo {
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
         .auth-logo img {
-            width: 175px;
-            height: 130px;
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
             object-fit: cover;
             margin: 0 auto;
+            border: 2px solid var(--accent);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .auth-title {
             font-family: 'Nunito', sans-serif;
             text-align: center;
-            font-size: 1.55rem;
+            font-size: 1.6rem;
             font-weight: 800;
-            color: #5B3A1A;
+            color: var(--primary);
             margin-bottom: 4px;
         }
 
         .auth-subtitle {
             text-align: center;
             font-size: 0.9rem;
-            color: #9A887A;
-            margin-bottom: 28px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
         }
 
-        /* Form */
+        /* Form Controls */
         .input-group {
             margin-bottom: 18px;
-            position: relative;
         }
 
         .input-group label {
             display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #5B3A1A;
+            font-size: 0.825rem;
+            font-weight: 700;
+            color: var(--primary);
             margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.4px;
@@ -168,105 +142,104 @@
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 1rem;
-            color: #9A887A;
+            font-size: 1.1rem;
+            color: var(--text-muted);
             pointer-events: none;
         }
 
         .input-wrapper input {
             width: 100%;
-            padding: 13px 16px 13px 42px;
-            border: 1.5px solid #E8DDD0;
-            border-radius: 12px;
+            min-height: 48px;
+            padding: 12px 16px 12px 44px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
             font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            color: #2C1A0E;
-            background: #FBF7F0;
+            font-size: 1rem;
+            color: var(--text);
+            background: #FAF7F2;
             outline: none;
-            transition: border-color 0.25s, box-shadow 0.25s;
+            transition: all 0.25s ease;
         }
 
         .input-wrapper input:focus {
-            border-color: #D4A03C;
-            box-shadow: 0 0 0 3px rgba(212, 160, 60, 0.15);
-            background: #fff;
-        }
-
-        .input-wrapper input::placeholder {
-            color: #BCBCBC;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(212, 160, 60, 0.2);
+            background: #FFFFFF;
         }
 
         .btn-login {
             width: 100%;
+            min-height: 50px;
             padding: 14px;
             border: none;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #5B3A1A 0%, #7A5230 100%);
-            color: #fff;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--primary) 0%, #7E532B 100%);
+            color: #FFFFFF;
             font-family: 'Inter', sans-serif;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
-            margin-top: 6px;
+            box-shadow: 0 4px 14px rgba(91, 58, 26, 0.25);
+            transition: all 0.25s ease;
+            margin-top: 8px;
         }
 
         .btn-login:hover {
-            background: linear-gradient(135deg, #3E2710 0%, #5B3A1A 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(91, 58, 26, 0.25);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            box-shadow: 0 6px 20px rgba(91, 58, 26, 0.35);
+            transform: translateY(-2px);
         }
 
         .btn-login:active {
-            transform: translateY(0);
+            transform: scale(0.98);
         }
 
         .auth-footer {
             text-align: center;
             margin-top: 22px;
-            font-size: 0.9rem;
-            color: #6B5344;
+            font-size: 0.925rem;
+            color: var(--text-muted);
         }
 
         .auth-footer a {
-            color: #5B3A1A;
-            font-weight: 600;
+            color: var(--primary);
+            font-weight: 700;
             text-decoration: none;
         }
 
         .auth-footer a:hover {
-            color: #D4A03C;
+            color: var(--accent-dark);
             text-decoration: underline;
         }
 
-        /* Earthy decoration */
-        .auth-decor {
+        .auth-back-home {
+            display: block;
             text-align: center;
-            margin-top: 24px;
-            font-size: 0.8rem;
-            color: #9A887A;
+            margin-top: 14px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.875rem;
+            text-decoration: none;
+            font-weight: 500;
         }
 
-        .auth-decor img {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            vertical-align: middle;
-            margin-right: 4px;
+        .auth-back-home:hover {
+            color: var(--accent-light);
         }
 
         @media (max-width: 480px) {
-            .auth-card {
-                padding: 32px 24px 28px;
-            }
-
             body {
-                padding: 16px;
+                padding: 16px 12px;
+            }
+            .auth-card {
+                padding: 28px 20px;
+                border-radius: var(--radius-md);
+            }
+            .auth-title {
+                font-size: 1.4rem;
             }
         }
     </style>
 </head>
-
 <body>
     <div class="auth-container">
         <!-- Flash Messages -->
@@ -285,14 +258,14 @@
                 <img src="{{ url_for('static', filename='images/TulunadLogo.png') }}" alt="Tulunad Logo">
             </div>
             <h1 class="auth-title">Welcome Back</h1>
-            <p class="auth-subtitle">Log in to Tulunad Homestay</p>
+            <p class="auth-subtitle">Log in to Puranat & Tulunad Homestay</p>
 
             <form method="POST" action="{{ url_for('auth.login') }}">
                 <div class="input-group">
-                    <label for="email">Email</label>
+                    <label for="email">Email Address</label>
                     <div class="input-wrapper">
                         <span class="input-icon">✉</span>
-                        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                        <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">
                     </div>
                 </div>
 
@@ -300,23 +273,19 @@
                     <label for="password">Password</label>
                     <div class="input-wrapper">
                         <span class="input-icon">🔒</span>
-                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
                     </div>
                 </div>
 
-                <button type="submit" class="btn-login">Login</button>
+                <button type="submit" class="btn-login">Login to Account →</button>
             </form>
 
             <p class="auth-footer">
-                Don't have an account? <a href="{{ url_for('auth.register') }}">Register here</a>
+                Don't have an account yet? <a href="{{ url_for('auth.register') }}">Register here</a>
             </p>
         </div>
 
-        <p class="auth-decor">
-            <img src="{{ url_for('static', filename='images/TulunadLogo.png') }}" alt="Tulunad Logo">
-            Tulunad Homestay · Mangaluru · Udupi, Karnataka
-        </p>
+        <a href="{{ url_for('home') }}" class="auth-back-home">← Return to Homepage</a>
     </div>
 </body>
-
 </html>

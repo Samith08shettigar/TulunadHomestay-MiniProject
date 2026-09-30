@@ -5,111 +5,132 @@
 <style>
     .booking-layout {
         display: grid;
-        grid-template-columns: 1fr 1.2fr;
+        grid-template-columns: 1fr 1.15fr;
         gap: 32px;
         align-items: start;
     }
 
-    /* Room Summary Card */
+    /* ── Room Summary Card ───────────────────────────────────── */
     .room-summary {
-        background: var(--card-bg);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow);
+        background: var(--bg-surface);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-light);
         overflow: hidden;
         position: sticky;
-        top: 88px;
+        top: calc(var(--header-height) + 20px);
     }
 
-    /* ── Image Gallery ─────────────────────────── */
     .gallery {
         position: relative;
         width: 100%;
-        background: #0b0b0b;
+        background: #111;
     }
+
     .gallery-main {
         width: 100%;
         height: 280px;
         object-fit: cover;
         display: block;
-        transition: opacity 0.3s ease;
-    }
-    .gallery-main.fade-out {
-        opacity: 0;
-    }
-    .gallery-thumbs {
-        display: flex;
-        gap: 6px;
-        padding: 8px 10px;
-        overflow-x: auto;
-        background: rgba(0,0,0,0.25);
-    }
-    .gallery-thumbs img {
-        width: 56px;
-        height: 42px;
-        object-fit: cover;
-        border-radius: 6px;
-        cursor: pointer;
-        border: 2px solid transparent;
-        opacity: 0.6;
-        transition: opacity 0.25s ease, border-color 0.25s ease;
-        flex-shrink: 0;
-    }
-    .gallery-thumbs img:hover {
-        opacity: 0.85;
-    }
-    .gallery-thumbs img.active {
-        border-color: var(--primary, #f4845f);
-        opacity: 1;
+        transition: opacity 0.25s ease;
     }
 
-    /* Single cover image fallback (no gallery) */
-    .room-summary > img.cover-only {
-        width: 100%;
-        height: 220px;
+    .gallery-main.fade-out {
+        opacity: 0.2;
+    }
+
+    .gallery-thumbs {
+        display: flex;
+        gap: 8px;
+        padding: 10px 12px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        background: rgba(30, 18, 9, 0.85);
+    }
+
+    .gallery-thumbs img {
+        width: 60px;
+        height: 46px;
         object-fit: cover;
+        border-radius: var(--radius-xs);
+        cursor: pointer;
+        border: 2px solid transparent;
+        opacity: 0.65;
+        transition: all var(--ease-standard);
+        flex-shrink: 0;
+    }
+
+    .gallery-thumbs img:hover,
+    .gallery-thumbs img.active {
+        border-color: var(--accent);
+        opacity: 1;
+        transform: scale(1.05);
     }
 
     .room-summary-body {
         padding: 24px;
     }
+
     .room-summary-name {
         font-family: 'Nunito', sans-serif;
-        font-size: 1.35rem;
-        font-weight: 700;
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--primary);
         margin-bottom: 8px;
     }
+
     .room-summary-price {
         font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--primary);
-        margin-bottom: 6px;
+        font-weight: 800;
+        color: var(--terracotta);
+        margin-bottom: 8px;
     }
+
     .room-summary-price span {
         font-size: 0.85rem;
-        font-weight: 400;
+        font-weight: 500;
         color: var(--text-muted);
     }
+
     .room-summary-meta {
-        font-size: 0.9rem;
-        color: var(--text-light);
-        margin-bottom: 12px;
-    }
-    .room-summary-desc {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--bg-alt);
+        padding: 4px 12px;
+        border-radius: var(--radius-pill);
         font-size: 0.875rem;
-        color: var(--text-light);
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 14px;
+    }
+
+    .room-summary-desc {
+        font-size: 0.9rem;
+        color: var(--text-muted);
         line-height: 1.6;
     }
 
-    /* Booking Form Card */
+    /* ── Booking Form Card ───────────────────────────────────── */
     .booking-form-card {
-        background: var(--card-bg);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow);
+        background: var(--bg-surface);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-light);
         padding: 32px;
+        border-top: 4px solid var(--accent);
     }
+
     .booking-form-card h2 {
+        font-size: 1.45rem;
+        margin-bottom: 6px;
+        color: var(--primary);
+    }
+
+    .booking-form-card .form-subtitle {
+        color: var(--text-muted);
+        font-size: 0.9rem;
         margin-bottom: 24px;
-        font-size: 1.4rem;
     }
 
     .date-row {
@@ -118,88 +139,89 @@
         gap: 16px;
     }
 
-    .radio-group {
-        display: flex;
-        gap: 20px;
-        margin-top: 4px;
-    }
-    .radio-group label {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        cursor: pointer;
-        font-size: 0.925rem;
-        color: var(--text);
-        font-weight: 400;
-        text-transform: none;
-        letter-spacing: 0;
-    }
-    .radio-group input[type="radio"] {
-        accent-color: var(--primary);
-        width: 16px;
-        height: 16px;
-    }
-
-    /* Live Total */
+    /* Live Price Summary Box */
     .price-summary {
-        background: var(--bg-alt);
-        border-radius: var(--radius);
+        background: linear-gradient(135deg, var(--bg-alt) 0%, #EFE5D8 100%);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
         padding: 20px;
         margin: 24px 0;
     }
+
     .price-row {
         display: flex;
         justify-content: space-between;
-        font-size: 0.925rem;
-        color: var(--text-light);
-        margin-bottom: 8px;
+        align-items: center;
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        margin-bottom: 10px;
     }
+
     .price-row:last-child {
         margin-bottom: 0;
-        padding-top: 10px;
-        border-top: 1px solid var(--border);
-        font-weight: 700;
-        font-size: 1.1rem;
+        padding-top: 12px;
+        border-top: 1.5px solid rgba(91, 58, 26, 0.15);
+        font-weight: 800;
+        font-size: 1.2rem;
         color: var(--primary);
     }
 
-    @media (max-width: 768px) {
+    /* ── Responsive Mobile Layout ────────────────────────────── */
+    @media (max-width: 860px) {
         .booking-layout {
             grid-template-columns: 1fr;
+            gap: 24px;
         }
-        .room-summary { position: static; }
-        .date-row { grid-template-columns: 1fr; }
-        .gallery-main { height: 220px; }
+
+        .room-summary {
+            position: static;
+        }
+
+        .gallery-main {
+            height: 220px;
+        }
+
+        .booking-form-card {
+            padding: 22px 18px;
+        }
+
+        .date-row {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="section-header mt-4">
-        <h2>Book Your Stay</h2>
-        <a href="{{ url_for('user.rooms') }}" class="btn btn-outline btn-sm">← Back to Rooms</a>
+    <div class="section-header">
+        <div>
+            <h2>Confirm Your Reservation</h2>
+            <p style="color:var(--text-muted); font-size:0.95rem; margin-top:4px;">
+                Complete your details below to book this heritage cottage.
+            </p>
+        </div>
+        <a href="{{ url_for('user.rooms') }}" class="btn btn-outline btn-sm">← Back to All Rooms</a>
     </div>
 
     <div class="booking-layout">
-        <!-- Room Summary -->
+        <!-- Room Summary & Gallery -->
         <div class="room-summary">
-
             {% if images %}
-            <!-- Image Gallery -->
             <div class="gallery" id="roomGallery">
                 <img
                     class="gallery-main"
                     id="galleryMain"
                     src="{{ images[0]['image_url'] }}"
                     alt="{{ room['room_name'] }}"
-                    onerror="this.src='https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800'"
+                    onerror="this.src='https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=800'"
                 >
                 <div class="gallery-thumbs" id="galleryThumbs">
                     {% for img in images %}
                     <img
                         src="{{ img['image_url'] }}"
-                        alt="Image {{ loop.index }}"
+                        alt="Thumbnail {{ loop.index }}"
                         data-full="{{ img['image_url'] }}"
                         class="{{ 'active' if loop.first else '' }}"
                         onerror="this.style.display='none'"
@@ -208,28 +230,30 @@
                 </div>
             </div>
             {% else %}
-            <!-- Fallback: single cover image -->
             <img
-                class="cover-only"
+                class="gallery-main"
                 src="{{ room['image_url'] }}"
                 alt="{{ room['room_name'] }}"
-                onerror="this.src='https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800'"
+                onerror="this.src='https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=800'"
             >
             {% endif %}
 
             <div class="room-summary-body">
-                <div class="room-summary-name">{{ room['room_name'] }}</div>
+                <h3 class="room-summary-name">{{ room['room_name'] }}</h3>
                 <div class="room-summary-price">
                     ₹{{ "%.0f"|format(room['price']) }} <span>/ night</span>
                 </div>
-                <div class="room-summary-meta">👥 {{ room['capacity'] }} guests max</div>
-                <div class="room-summary-desc">{{ room['description'] }}</div>
+                <div class="room-summary-meta">
+                    👥 Capacity: Up to {{ room['capacity'] }} guests
+                </div>
+                <p class="room-summary-desc">{{ room['description'] }}</p>
             </div>
         </div>
 
         <!-- Booking Form -->
         <div class="booking-form-card">
-            <h2>Reservation Details</h2>
+            <h2>Select Dates & Preferences</h2>
+            <p class="form-subtitle">Prices are automatically calculated per night based on selected dates.</p>
 
             <form method="POST" action="{{ url_for('user.book_room', room_id=room['id']) }}" id="bookingForm">
                 <div class="date-row">
@@ -248,18 +272,18 @@
                 <div class="form-group">
                     <label for="meal_type" class="form-label">Meal Preference</label>
                     <select class="form-control" id="meal_type" name="meal_type">
-                        <option value="Veg">🥬 Vegetarian</option>
-                        <option value="Non-Veg">🍗 Non-Vegetarian</option>
-                        <option value="Both">🍽️ Both (Veg + Non-Veg)</option>
+                        <option value="Veg">🥬 Vegetarian (Traditional South Kanara Cuisine)</option>
+                        <option value="Non-Veg">🍗 Non-Vegetarian (Authentic Mangalorean Fish & Chicken)</option>
+                        <option value="Both">🍽️ Both (Mixed Preference)</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Campfire Experience</label>
+                    <label class="form-label">Campfire Night Experience</label>
                     <div class="radio-group">
                         <label>
                             <input type="radio" name="fire_camp" value="Yes">
-                            🔥 Yes, I'd love a campfire!
+                            🔥 Yes, include evening campfire
                         </label>
                         <label>
                             <input type="radio" name="fire_camp" value="No" checked>
@@ -268,15 +292,15 @@
                     </div>
                 </div>
 
-                <!-- Live Price Summary -->
+                <!-- Live Price Calculation Box -->
                 <div class="price-summary" id="priceSummary" style="display:none;">
                     <div class="price-row">
-                        <span>Price per night</span>
+                        <span>Rate per night</span>
                         <span>₹{{ "%.0f"|format(room['price']) }}</span>
                     </div>
                     <div class="price-row">
                         <span>Number of nights</span>
-                        <span id="nightCount">—</span>
+                        <span id="nightCount" style="font-weight:700; color:var(--primary);">—</span>
                     </div>
                     <div class="price-row">
                         <span>Estimated Total</span>
@@ -285,7 +309,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block" id="submitBtn" disabled>
-                    Confirm Booking
+                    Confirm & Submit Booking →
                 </button>
             </form>
         </div>
@@ -295,11 +319,11 @@
 
 {% block extra_js %}
 <script>
-    /* ── Image Gallery Switcher ──────────────────── */
+    /* ── Gallery Switcher ─────────────────────────── */
     (function () {
         const mainImg = document.getElementById('galleryMain');
         const thumbs  = document.getElementById('galleryThumbs');
-        if (!mainImg || !thumbs) return;           // no gallery
+        if (!mainImg || !thumbs) return;
 
         thumbs.addEventListener('click', function (e) {
             const thumb = e.target.closest('img');
@@ -308,20 +332,18 @@
             const newSrc = thumb.getAttribute('data-full');
             if (!newSrc || newSrc === mainImg.src) return;
 
-            // Fade out → swap → fade in
             mainImg.classList.add('fade-out');
             setTimeout(function () {
                 mainImg.src = newSrc;
                 mainImg.classList.remove('fade-out');
-            }, 300);
+            }, 200);
 
-            // Update active state
             thumbs.querySelectorAll('img').forEach(function (t) { t.classList.remove('active'); });
             thumb.classList.add('active');
         });
     })();
 
-    /* ── Price Calculator (unchanged logic) ────── */
+    /* ── Live Price Calculator ────────────────────── */
     const pricePerNight = {{ room['price'] }};
     const checkinInput = document.getElementById('checkin_date');
     const checkoutInput = document.getElementById('checkout_date');
@@ -355,7 +377,6 @@
         }
     }
 
-    // Auto-set checkout min when checkin changes
     checkinInput.addEventListener('change', function() {
         if (this.value) {
             const nextDay = new Date(this.value);

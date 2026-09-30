@@ -25,9 +25,9 @@ def seed():
                     'admin'
                 )
             )
-            print('✅ Admin user created.')
+            print('[OK] Admin user created.')
         else:
-            print('ℹ️  Admin user already exists, skipping.')
+            print('[INFO] Admin user already exists, skipping.')
 
         # --- Sample Rooms ---
         existing_rooms = db.execute('SELECT COUNT(*) FROM rooms').fetchone()[0]
@@ -64,12 +64,12 @@ def seed():
                 'INSERT INTO rooms (room_name, price, capacity, description, image_url, availability) VALUES (?, ?, ?, ?, ?, ?)',
                 rooms
             )
-            print('✅ 3 sample rooms created.')
+            print('[OK] 3 sample rooms created.')
         else:
-            print(f'ℹ️  {existing_rooms} room(s) already exist, skipping.')
+            print(f'[INFO] {existing_rooms} room(s) already exist, skipping.')
 
         db.commit()
-        print('🌱 Seeding complete!')
+        print('[DONE] Seeding complete!')
 
 
 if __name__ == '__main__':
